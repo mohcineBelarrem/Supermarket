@@ -12,13 +12,20 @@ struct ProductListView: View {
     
     var body: some View {
         NavigationView {
-            List {
-                ForEach(presenter.products) { product in
-                    VStack(alignment: .leading) {
-                        Text(product.name)
-                            .font(.headline)
-                        Text(product.category)
-                            .font(.subheadline)
+            if let error = presenter.errorMessage {
+                Text("Error: \(error)")
+                    .foregroundColor(.red)
+            } else if presenter.products.isEmpty {
+                ProgressView("Loading...")
+            } else {
+                List {
+                    ForEach(presenter.products) { product in
+                        VStack(alignment: .leading) {
+                            Text(product.name)
+                                .font(.headline)
+                            Text(product.category)
+                                .font(.subheadline)
+                        }
                     }
                 }
             }

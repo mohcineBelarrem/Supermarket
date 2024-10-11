@@ -5,17 +5,25 @@
 //  Created by Mohcine on 11/10/2024.
 //
 
+import Combine
 import Foundation
 
 protocol ProductListInteractorProtocol {
-    func fetchProducts() -> [Product]
+    func fetchProducts() -> AnyPublisher<[Product], Error>
 }
 
 class ProductListInteractor: ProductListInteractorProtocol {
-    func fetchProducts() -> [Product] {
-        return [
-                .init(id: UUID(), name: "Apples", category: "Fruits", inStock: true),
-                .init(id: UUID(), name: "Columbia 100% Arabica", category: "Coffee", inStock: true),
-        ]
+    private let apiStringURL = "https://simple-grocery-store-api.glitch.me/products/"
+    
+    func fetchProducts() -> AnyPublisher<[Product], Error> {
+        guard let url = URL(string: apiStringURL) else { return
+            Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .map { $0.data }
+            .decode(type: [Product].self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
     }
 }

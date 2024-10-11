@@ -20,12 +20,7 @@ struct ProductListView: View {
             } else {
                 List {
                     ForEach(presenter.products) { product in
-                        VStack(alignment: .leading) {
-                            Text(product.name)
-                                .font(.headline)
-                            Text(product.category)
-                                .font(.subheadline)
-                        }
+                        
                     }
                 }
             }

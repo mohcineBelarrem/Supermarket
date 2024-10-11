@@ -10,8 +10,13 @@ import SwiftUI
 @main
 struct SupermarketApp: App {
     var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+           WindowGroup {
+               TabView {
+                   ProductListRouter.createModule()
+                       .tabItem {
+                           Label("Products", systemImage: "cart")
+                       }
+               }
+           }
+       }
 }

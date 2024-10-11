@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct Product: Identifiable {
-    let id: UUID
+struct Product: Identifiable, Decodable {
+    let id: Int
     let name: String
     let category: String
     let inStock: Bool

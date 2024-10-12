@@ -20,7 +20,15 @@ struct ProductListView: View {
             } else {
                 List {
                     ForEach(presenter.productCategories) { category in
-                        CategoryView(category: category)
+                        Section(header: Text(category.name)) {
+                            ForEach(category.products) { product in
+                               NavigationLink {
+                                    presenter.detailView(for: product.id)
+                                } label: {
+                                    ProductView(product: product) //TODO: Fix me
+                                }
+                            }
+                        }
                     }
                 }
             }

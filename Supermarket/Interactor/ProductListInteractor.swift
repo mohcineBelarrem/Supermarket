@@ -13,10 +13,9 @@ protocol ProductListInteractorProtocol {
 }
 
 class ProductListInteractor: ProductListInteractorProtocol {
-    private let apiStringURL = "https://simple-grocery-store-api.glitch.me/products/"
     
     func fetchProducts() -> AnyPublisher<[Product], Error> {
-        guard let url = URL(string: apiStringURL) else { return
+        guard let url = APIConfig.url(for: .products) else { return
             Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         

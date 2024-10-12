@@ -13,10 +13,9 @@ protocol APIStatusInteractorProtocol {
 }
 
 class APIStatusInteractor: APIStatusInteractorProtocol {
-    private let apiStatusStringURL = "https://simple-grocery-store-api.glitch.me/status"
     
     func checkAPIStatus() -> AnyPublisher<Bool, Error> {
-        guard let url = URL(string: apiStatusStringURL) else { return
+        guard let url = APIConfig.url(for: .apiStatus) else { return
             Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
        

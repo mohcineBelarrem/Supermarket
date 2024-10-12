@@ -11,12 +11,7 @@ import SwiftUI
 struct SupermarketApp: App {
     var body: some Scene {
            WindowGroup {
-               TabView {
-                   ProductListRouter.createModule()
-                       .tabItem {
-                           Label("Products", systemImage: "cart")
-                       }
-               }
+               APIStatusRouter.createModule()
            }
        }
 }

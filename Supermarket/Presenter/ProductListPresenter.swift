@@ -13,7 +13,7 @@ class ProductListPresenter: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
-    @Published var products: [Product] = []
+    @Published var products: [ProductPresentationModel] = []
     @Published var errorMessage: String?
     
     init(interactor: ProductListInteractorProtocol, router: ProductListRouterProtocol) {
@@ -23,6 +23,15 @@ class ProductListPresenter: ObservableObject {
     
     func viewDidLoad() {
         interactor.fetchProducts()
+            .map { (products : [Product]) in
+                products.map { product in
+                    ProductPresentationModel(id: product.id,
+                                              name: product.name,
+                                              category: product.category,
+                                              inStock: product.inStock,
+                                              availability: product.inStock ? "Available" : "Out of Stock")
+                }
+            }
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .failure(let error):

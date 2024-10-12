@@ -20,7 +20,7 @@ struct ProductListView: View {
             } else {
                 List {
                     ForEach(presenter.products) { product in
-                        
+                        ProductView(product: product)
                     }
                 }
             }

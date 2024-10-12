@@ -23,9 +23,9 @@ struct ProductListView: View {
                         Section(header: Text(category.name)) {
                             ForEach(category.products) { product in
                                NavigationLink {
-                                    presenter.detailView(for: product.id)
+                                    presenter.detailView(for: product)
                                 } label: {
-                                    ProductView(product: product) //TODO: Fix me
+                                    presenter.productView(for: product)
                                 }
                             }
                         }

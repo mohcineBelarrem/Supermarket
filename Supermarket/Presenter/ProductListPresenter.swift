@@ -51,7 +51,11 @@ class ProductListPresenter: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func detailView(for productId: Int) -> AnyView {
-        router.routeToDetailView(for: productId)
+    func detailView(for product: ProductPresentationModel) -> AnyView {
+        router.routeToDetailView(for: product)
+    }
+    
+    func productView(for product: ProductPresentationModel) -> AnyView {
+        router.routeToProductView(for: product)
     }
 }

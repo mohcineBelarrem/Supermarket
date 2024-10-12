@@ -10,7 +10,8 @@ import SwiftUI
 
 protocol ProductListRouterProtocol {
     static func createModule() -> AnyView
-    func routeToDetailView(for id: Int) -> AnyView
+    func routeToDetailView(for product: ProductPresentationModel) -> AnyView
+    func routeToProductView(for product: ProductPresentationModel) -> AnyView
 }
 
 class ProductListRouter: ProductListRouterProtocol {
@@ -22,7 +23,11 @@ class ProductListRouter: ProductListRouterProtocol {
         return AnyView(ProductListView(presenter: presenter))
     }
     
-    func routeToDetailView(for id: Int) -> AnyView {
-        ProductDetailRouter.createModule(with: id)
+    func routeToDetailView(for product: ProductPresentationModel) -> AnyView {
+        ProductDetailRouter.createModule(with: product.id)
+    }
+    
+    func routeToProductView(for product: ProductPresentationModel) -> AnyView {
+        AnyView(ProductView(product: product))
     }
 }

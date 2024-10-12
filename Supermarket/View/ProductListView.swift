@@ -26,7 +26,9 @@ struct ProductListView: View {
             }
         }
         .onAppear {
-            presenter.viewDidLoad()
+            if presenter.productCategories.isEmpty {
+                presenter.viewDidLoad()
+            }
         }
     }
 }

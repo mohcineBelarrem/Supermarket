@@ -11,22 +11,25 @@ struct APIStatusView: View {
     @ObservedObject var presenter: APIStatusPresenter
 
     var body: some View {
-        VStack {
-            if let currentView = presenter.currentView {
-                currentView 
-            } else if let error = presenter.errorMessage {
-                Text("API is down: \(error)")
-                    .font(.headline)
-                    .foregroundColor(.red)
-                
-                Button("Retry") {
-                    presenter.checkAPIStatus()
-                }
-            } else {
-                ProgressView("Checking API status...")
-                    .onAppear {
+        NavigationStack {
+            VStack {
+                if let error = presenter.errorMessage {
+                    Text("API is down: \(error)")
+                        .font(.headline)
+                        .foregroundColor(.red)
+                    
+                    Button("Retry") {
                         presenter.checkAPIStatus()
                     }
+                } else {
+                    ProgressView("Checking API status...")
+                        .onAppear {
+                            presenter.checkAPIStatus()
+                        }
+                }
+            }
+            .navigationDestination(isPresented: $presenter.shouldNavigateToMainView) {
+                presenter.mainView
             }
         }
     }

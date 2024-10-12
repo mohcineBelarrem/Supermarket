@@ -13,10 +13,13 @@ class APIStatusPresenter: ObservableObject {
     private let router: APIStatusRouterProtocol
     private var cancellables = Set<AnyCancellable>()
     
-    @Published var isAPIHealthy: Bool = false
     @Published var errorMessage: String?
-    @Published var currentView: AnyView? = nil
+    @Published var shouldNavigateToMainView: Bool = false
 
+    var mainView: AnyView {
+        router.navigateToMainView()
+    }
+    
     init(interactor: APIStatusInteractorProtocol, router: APIStatusRouterProtocol) {
         self.interactor = interactor
         self.router = router
@@ -29,10 +32,7 @@ class APIStatusPresenter: ObservableObject {
                     self.errorMessage = error.localizedDescription
                 }
             }, receiveValue: { isHealthy in
-                self.isAPIHealthy = isHealthy
-                if isHealthy {
-                    self.currentView = self.router.navigateToProductListScreen()
-                }
+                self.shouldNavigateToMainView = isHealthy
             })
             .store(in: &cancellables)
     }

@@ -9,12 +9,12 @@ import SwiftUI
 
 protocol APIStatusRouterProtocol {
     static func createModule() -> AnyView
-    func navigateToProductListScreen() -> AnyView
+    func navigateToMainView() -> AnyView
 }
 
 class APIStatusRouter: APIStatusRouterProtocol {
-    func navigateToProductListScreen() -> AnyView {
-        return ProductListRouter.createModule()
+    func navigateToMainView() -> AnyView {
+        return AnyView(MainView())
     }
     
     static func createModule() -> AnyView {

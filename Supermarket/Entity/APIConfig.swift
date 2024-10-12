@@ -10,10 +10,18 @@ import Foundation
 struct APIConfig {
     static let baseURL = "https://simple-grocery-store-api.glitch.me"
     
-    // Endpoints for different API calls
-    enum Endpoint: String {
-        case apiStatus = "/status"
-        case products = "/products"
+    enum Endpoint {
+        case apiStatus
+        case products
+        case productDetail(Int)
+        
+        var rawValue: String {
+            switch self {
+            case .apiStatus: return "/status"
+            case .products: return "/products"
+            case .productDetail(let id): return "/products/\(id)"
+            }
+        }
     }
     
     // Utility function to create full URL for a given endpoint

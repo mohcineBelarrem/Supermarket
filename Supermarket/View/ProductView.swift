@@ -13,8 +13,6 @@ struct ProductView: View {
         VStack(alignment: .leading) {
             Text(product.name)
                 .font(.headline)
-            Text(product.category)
-                .font(.subheadline)
             Text(product.availability)
                 .foregroundColor(product.inStock ? .green : .red)
         }

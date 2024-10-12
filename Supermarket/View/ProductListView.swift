@@ -15,12 +15,12 @@ struct ProductListView: View {
             if let error = presenter.errorMessage {
                 Text("Error: \(error)")
                     .foregroundColor(.red)
-            } else if presenter.products.isEmpty {
+            } else if presenter.productCategories.isEmpty {
                 ProgressView("Loading...")
             } else {
                 List {
-                    ForEach(presenter.products) { product in
-                        ProductView(product: product)
+                    ForEach(presenter.productCategories) { category in
+                        CategoryView(category: category)
                     }
                 }
             }

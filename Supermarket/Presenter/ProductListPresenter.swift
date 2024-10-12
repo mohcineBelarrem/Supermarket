@@ -5,6 +5,7 @@
 //  Created by Mohcine on 11/10/2024.
 //
 
+import Foundation
 import Combine
 
 class ProductListPresenter: ObservableObject {
@@ -13,7 +14,7 @@ class ProductListPresenter: ObservableObject {
     
     private var cancellables = Set<AnyCancellable>()
     
-    @Published var products: [ProductPresentationModel] = []
+    @Published var productCategories: [CategoryPresentationModel] = []
     @Published var errorMessage: String?
     
     init(interactor: ProductListInteractorProtocol, router: ProductListRouterProtocol) {
@@ -24,12 +25,16 @@ class ProductListPresenter: ObservableObject {
     func viewDidLoad() {
         interactor.fetchProducts()
             .map { (products : [Product]) in
-                products.map { product in
-                    ProductPresentationModel(id: product.id,
-                                              name: product.name,
-                                              category: product.category,
-                                              inStock: product.inStock,
-                                              availability: product.inStock ? "Available" : "Out of Stock")
+                let categories = Dictionary(grouping: products, by: {$0.category})
+                return categories.map { (category: String, products: [Product]) in
+                    CategoryPresentationModel(id: UUID(),
+                                              name: category,
+                                              products: products.map { ProductPresentationModel(id: $0.id,
+                                                                                                name: $0.name,
+                                                                                                category: $0.category,
+                                                                                                inStock: $0.inStock,
+                                                                                                availability: $0.inStock ? "Available" : "Out of Stock")}
+                    )
                 }
             }
             .sink(receiveCompletion: { completion in
@@ -39,8 +44,8 @@ class ProductListPresenter: ObservableObject {
                 case .finished:
                     break
                 }
-            }, receiveValue: { products in
-                self.products = products
+            }, receiveValue: { productCategories in
+                self.productCategories = productCategories
             })
             .store(in: &cancellables)
     }

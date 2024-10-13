@@ -9,10 +9,11 @@ import Combine
 import SwiftUI
 
 protocol LoginPresenterProtocol: ObservableObject {
-    var accessToken: String? { get }
+    var user: UserPresentationModel? { get }
     var errorMessage: String? { get }
     func login(username: String, email: String)
     func profileView(for user: UserPresentationModel) -> AnyView
+    func logout()
 }
 
 class LoginPresenter: ObservableObject, LoginPresenterProtocol {
@@ -20,13 +21,14 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
     private let router: LoginRouterProtocol
     private var cancellables = Set<AnyCancellable>()
 
-    @Published var accessToken: String?
+    @Published var user: UserPresentationModel?
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
     
    init(interactor: LoginInteractorProtocol, router: LoginRouterProtocol) {
         self.interactor = interactor
         self.router = router
+        self.user = interactor.retrieveStoredCredentials()
     }
 
     func login(username: String, email: String) {
@@ -38,7 +40,9 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
                     self.isLoading = false
                 }
             }, receiveValue: { userCreationResponse in
-                self.accessToken = userCreationResponse.accessToken
+                let user: UserPresentationModel = .init(username: username, email: email, accessToken: userCreationResponse.accessToken)
+                self.user = user
+                self.interactor.store(user: user)
                 self.isLoading = false
             })
             .store(in: &cancellables)
@@ -46,5 +50,10 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
     
     func profileView(for user: UserPresentationModel) -> AnyView {
         router.routeToProfileView(for: user)
+    }
+    
+    func logout() {
+        interactor.clearStoredCredentials()
+        user = nil
     }
 }

@@ -10,6 +10,9 @@ import Combine
 
 protocol LoginInteractorProtocol {
     func login(username: String, email: String) -> AnyPublisher<UserCreationResponse, Error>
+    func store(user: UserPresentationModel)
+    func retrieveStoredCredentials() -> UserPresentationModel?
+    func clearStoredCredentials()
 }
 
 class LoginInteractor: LoginInteractorProtocol {
@@ -33,4 +36,24 @@ class LoginInteractor: LoginInteractorProtocol {
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
+    
+    func store(user: UserPresentationModel) {
+        KeychainHelper.save(user.email, forKey: UserPresentationModelKeys.email.rawValue)
+        KeychainHelper.save(user.username, forKey: UserPresentationModelKeys.username.rawValue)
+        KeychainHelper.save(user.accessToken, forKey: UserPresentationModelKeys.accessToken.rawValue)
+    }
+    
+    func retrieveStoredCredentials() -> UserPresentationModel? {
+        guard let email = KeychainHelper.read(forKey: UserPresentationModelKeys.email.rawValue),
+              let username = KeychainHelper.read(forKey: UserPresentationModelKeys.username.rawValue),
+              let accessToken = KeychainHelper.read(forKey: UserPresentationModelKeys.accessToken.rawValue) else { return nil }
+        return .init(username: username, email: email, accessToken: accessToken)
+    }
+    
+    func clearStoredCredentials() {
+        KeychainHelper.delete(forKey: UserPresentationModelKeys.username.rawValue)
+        KeychainHelper.delete(forKey: UserPresentationModelKeys.email.rawValue)
+        KeychainHelper.delete(forKey: UserPresentationModelKeys.accessToken.rawValue)
+    }
+    
 }

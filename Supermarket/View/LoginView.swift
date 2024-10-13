@@ -14,10 +14,20 @@ struct LoginView: View {
 
     var body: some View {
         VStack {
-            if let accessToken = presenter.accessToken {
-                presenter.profileView(for: .init(username: username,
-                                                 email: email,
-                                                 accessToken: accessToken))
+            if let user = presenter.user {
+                presenter.profileView(for: user)
+                
+                Button(action: {
+                    presenter.logout()
+                }, label: {
+                    Text("Logout")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(.red)
+                        .foregroundStyle(.white)
+                        .font(.system(size: 20, weight: .bold))
+                        .cornerRadius(8)
+                })
             } else {
                 
                 if presenter.isLoading {

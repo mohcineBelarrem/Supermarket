@@ -12,3 +12,10 @@ struct UserPresentationModel {
     let email: String
     let accessToken: String
 }
+
+enum UserPresentationModelKeys: String {
+    typealias RawValue = String
+    case username
+    case email
+    case accessToken
+}

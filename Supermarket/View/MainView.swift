@@ -11,13 +11,13 @@ struct MainView: View {
     var body: some View {
         TabView {
             ProductListRouter.createModule()
-            .tabItem {
-                Label("Products", systemImage: "list.bullet")
-            }
-            
-            Text("My Cart")
                 .tabItem {
-                    Label("My Cart", systemImage: "cart")
+                    Label("Products", systemImage: "list.bullet")
+                }
+            
+            LoginRouter.createModule()
+                .tabItem {
+                    Label("Profile", systemImage: "person.crop.circle")
                 }
         }
         .navigationBarBackButtonHidden(true)

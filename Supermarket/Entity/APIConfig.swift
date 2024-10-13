@@ -14,12 +14,14 @@ struct APIConfig {
         case apiStatus
         case products
         case productDetail(Int)
+        case userRegistration
         
         var rawValue: String {
             switch self {
             case .apiStatus: return "/status"
             case .products: return "/products"
             case .productDetail(let id): return "/products/\(id)"
+            case .userRegistration: return "/api-clients"
             }
         }
     }

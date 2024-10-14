@@ -12,6 +12,7 @@ import Combine
 protocol CartPresenterProtocol: ObservableObject {
     var cart: [CartItemPresentationModel]? { get }
     var errorMessage: String? { get }
+    var isUserLoggedIn: Bool { get }
     func loadCart()
 }
 
@@ -22,6 +23,10 @@ class CartPresenter: ObservableObject, CartPresenterProtocol {
 
     @Published var cart: [CartItemPresentationModel]?
     @Published var errorMessage: String?
+    
+    var isUserLoggedIn: Bool {
+        interactor.isUserLoggedIn
+    }
 
     init(interactor: CartInteractorProtocol, router: CartRouter) {
         self.interactor = interactor

@@ -9,6 +9,7 @@ import Foundation
 import Combine
 
 protocol CartInteractorProtocol {
+    var isUserLoggedIn: Bool { get }
     func fetchCart(with cartId: String) -> AnyPublisher<[CartItem], Error>
     func createCart() -> AnyPublisher<CartCreationResponse, Error>
     func storeCartId(with cartId: String)
@@ -18,6 +19,10 @@ protocol CartInteractorProtocol {
 class CartInteractor: CartInteractorProtocol {
     
     private let loginInteractor: LoginInteractorProtocol
+    
+    var isUserLoggedIn: Bool {
+        loginInteractor.isUserLoggedIn
+    }
     
     init(loginInteractor: LoginInteractorProtocol) {
         self.loginInteractor = loginInteractor

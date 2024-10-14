@@ -9,6 +9,7 @@ import Foundation
 import Combine
 
 protocol LoginInteractorProtocol {
+    var isUserLoggedIn: Bool { get }
     func login(username: String, email: String) -> AnyPublisher<UserCreationResponse, Error>
     func store(user: UserPresentationModel)
     func retrieveStoredCredentials() -> UserPresentationModel?
@@ -16,6 +17,11 @@ protocol LoginInteractorProtocol {
 }
 
 class LoginInteractor: LoginInteractorProtocol {
+    
+    var isUserLoggedIn: Bool {
+        retrieveStoredCredentials() != nil
+    }
+    
     func login(username: String, email: String) -> AnyPublisher<UserCreationResponse, Error> {
         guard let url = APIConfig.url(for: .userRegistration) else { return
             Fail(error: URLError(.badURL)).eraseToAnyPublisher()

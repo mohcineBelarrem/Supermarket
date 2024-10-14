@@ -10,32 +10,41 @@ import SwiftUI
 struct AddToCartButton: View {
     @ObservedObject var presenter: AddToCartPresenter
     var product: ProductPresentationModel
-    
+    @State var shouldBeDisabled: Bool = false
     var body: some View {
         Button {
             print("Buying \(product.name)")
         } label: {
-            Image(systemName: "cart")
-                .frame(width: 24, height: 24)
-                .padding(10)
-                .background(product.inStock ? .green : .gray)
-                .foregroundStyle(.white)
-                //.font(.system(size: 20, weight: .bold))
-                .cornerRadius(8)
+            
+            HStack(alignment: .center) {
                 
-                
+                if let _ = presenter.errorMessage {
+                    Text("")
+                } else if let quantity = presenter.productQuantityInCart {
+                    if quantity > 0 {
+                        Text("\(quantity)")
+                    } else {
+                        Image(systemName: "cart")
+                    }
+                    
+                } else {
+                    ProgressView("")
+                }
+            }
+            .frame(width: 24, height: 24)
+            .padding(10)
+            .background(product.inStock ? .green : .gray)
+            .foregroundStyle(.white)
+            //.font(.system(size: 20, weight: .bold))
+            .cornerRadius(8)
         }
         .disabled(!product.inStock)
+        .onAppear {
+            presenter.getProductQuantityInCart(for: product.id)
+        }
     }
 }
 
 #Preview {
-    let interactor = AddToCartInteractor()
-    let router = AddToCartRouter()
-    let presenter = AddToCartPresenter(interactor: interactor, router: router)
-    let product: ProductPresentationModel = .init(id: 1709,
-                                                  name: "Some Product",
-                                                  category: "Some Category",
-                                                  inStock: true)
-    AddToCartButton(presenter: presenter, product: product)
+    AddToCartRouter.createModule(with: .init(id: 1709, name: "Some Product", category: "Category", inStock: true))
 }

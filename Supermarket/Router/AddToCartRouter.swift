@@ -15,7 +15,9 @@ protocol AddToCartRouterProtocol {
 
 class AddToCartRouter: AddToCartRouterProtocol {
     static func createModule(with product: ProductPresentationModel) -> AnyView {
-        let interactor = AddToCartInteractor()
+        let loginInteractor = LoginInteractor()
+        let cartInteractor = CartInteractor(loginInteractor: loginInteractor)
+        let interactor = AddToCartInteractor(cartInteractor: cartInteractor)
         let router = AddToCartRouter()
         let presenter = AddToCartPresenter(interactor: interactor, router: router)
 

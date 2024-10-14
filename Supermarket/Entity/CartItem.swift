@@ -7,14 +7,13 @@
 
 import Foundation
 
-//typealias Cart = [CartItem]
+struct Cart {
+    let cartId: String
+    let items: [CartItem]
+}
 
 struct CartItem: Decodable {
     let id: Int
     let productId: Int
     let quantity: Int
-}
-
-enum CartError: Error {
-    case noCartId
 }

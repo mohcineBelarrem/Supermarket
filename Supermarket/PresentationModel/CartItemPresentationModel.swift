@@ -7,9 +7,26 @@
 
 import Foundation
 
+struct CartPresentationModel {
+    let cartId: String
+    let items: [CartItemPresentationModel]
+    
+    var isEmpty: Bool { items.isEmpty }
+    
+    init (_ cart: Cart) {
+        self.cartId = cart.cartId
+        self.items = cart.items.map { .init($0) }
+    }
+}
 
 struct CartItemPresentationModel: Identifiable {
     let id: Int
     let productId: Int
     let quantity: Int
+    
+    init(_ cartItem: CartItem) {
+        self.id = cartItem.id
+        self.productId = cartItem.productId
+        self.quantity = cartItem.quantity
+    }
 }

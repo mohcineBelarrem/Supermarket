@@ -27,7 +27,7 @@ struct CartView: View {
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
                     } else {
-                        List(cart) { item in
+                        List(cart.items) { item in
                             Text("ProductId:\(item.productId) Quantity:\(item.quantity)")
                         }
                     }

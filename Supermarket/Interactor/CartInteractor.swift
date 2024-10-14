@@ -10,8 +10,8 @@ import Combine
 
 protocol CartInteractorProtocol {
     var isUserLoggedIn: Bool { get }
-    func fetchCart(with cartId: String) -> AnyPublisher<[CartItem], Error>
-    func createCart() -> AnyPublisher<CartCreationResponse, Error>
+    func fetchCart() -> AnyPublisher<Cart?, Error>
+    func createCart() -> AnyPublisher<Cart?, Error>
     func storeCartId(with cartId: String)
     func getStoredCartId() -> String?
 }
@@ -28,15 +28,17 @@ class CartInteractor: CartInteractorProtocol {
         self.loginInteractor = loginInteractor
     }
     
-    func fetchCart(with cartId: String) -> AnyPublisher<[CartItem], Error> {
+    func fetchCart() -> AnyPublisher<Cart?, Error> {
         
         guard let user = loginInteractor.retrieveStoredCredentials() else { return
             Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
         }
         
-//        guard let cartId = getStoredCartId() else { return
-//            Fail(error: CartError.noCartId).eraseToAnyPublisher()
-//        }
+        guard let cartId = getStoredCartId() else {
+            return Future { promise in promise(.success(nil)) }
+                    .delay(for: 1.0, scheduler: RunLoop.main)
+                    .eraseToAnyPublisher()
+        }
         
         guard let url = APIConfig.url(for: .getCartItems(cartId)) else { return
             Fail(error: URLError(.badURL)).eraseToAnyPublisher()
@@ -48,11 +50,14 @@ class CartInteractor: CartInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: [CartItem].self, decoder: JSONDecoder())
+            .map { (cartItems: [CartItem]) in
+                Cart(cartId: cartId, items: cartItems)
+            }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 
-    func createCart() -> AnyPublisher<CartCreationResponse, Error> {
+    func createCart() -> AnyPublisher<Cart?, Error> {
         
         guard let user = loginInteractor.retrieveStoredCredentials() else { return
             Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
@@ -70,6 +75,12 @@ class CartInteractor: CartInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: CartCreationResponse.self, decoder: JSONDecoder())
+            .map { cartCreationResponse in
+                if cartCreationResponse.created {
+                    return Cart(cartId: cartCreationResponse.cartId, items: [])
+                }
+                return nil
+            }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }

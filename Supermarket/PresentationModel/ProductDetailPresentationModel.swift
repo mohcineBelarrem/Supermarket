@@ -16,4 +16,8 @@ struct ProductDetailPresentationModel: Identifiable {
     let formattedPrice: String
     let currentStock: Int
     let manufacturer: String
+    
+    var product: ProductPresentationModel {
+        .init(id: id, name: name, category: category, inStock: inStock, availability: availability)
+    }
 }

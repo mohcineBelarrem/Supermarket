@@ -9,10 +9,21 @@ import Combine
 import Foundation
 
 protocol ProductDetailInteractorProtocol {
+    var isUserLoggedIn: Bool { get }
     func getProductDetail(for productId: Int) -> AnyPublisher<ProductDetail, Error>
 }
 
 class ProductDetailInteractor: ProductDetailInteractorProtocol {
+    
+    private let loginInteractor: LoginInteractorProtocol
+    
+    var isUserLoggedIn: Bool {
+        loginInteractor.isUserLoggedIn
+    }
+    
+    init(loginInteractor: LoginInteractorProtocol) {
+        self.loginInteractor = loginInteractor
+    }
     
     func getProductDetail(for productId: Int) -> AnyPublisher<ProductDetail, Error> {
         guard let url = APIConfig.url(for: .productDetail(productId)) else { return

@@ -7,8 +7,16 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
-class ProductDetailPresenter: ObservableObject {
+protocol ProductDetailPresenterProtocol: ObservableObject {
+    var isUserLoggedIn: Bool { get }
+    func loadProductDetail(for productId: Int)
+    func addToCartView(for product: ProductPresentationModel) -> AnyView
+}
+
+
+class ProductDetailPresenter: ProductDetailPresenterProtocol {
     private let interactor: ProductDetailInteractorProtocol
     private let router: ProductDetailRouterProtocol
     
@@ -16,6 +24,10 @@ class ProductDetailPresenter: ObservableObject {
     
     @Published var productDetail: ProductDetailPresentationModel?
     @Published var errorMessage: String?
+    
+    var isUserLoggedIn: Bool {
+        interactor.isUserLoggedIn
+    }
     
     init(interactor: ProductDetailInteractorProtocol, router: ProductDetailRouterProtocol) {
         self.interactor = interactor
@@ -44,5 +56,9 @@ class ProductDetailPresenter: ObservableObject {
                 self.productDetail = productDetail
             })
             .store(in: &cancellables)
+    }
+    
+    func addToCartView(for product: ProductPresentationModel) -> AnyView {
+        router.routeToAddtoCartButton(for: product)
     }
 }

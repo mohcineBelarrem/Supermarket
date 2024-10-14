@@ -18,12 +18,17 @@ struct ProductDetailView: View {
                     .font(.headline)
                     .foregroundColor(.red)
             } else if let productDetail = presenter.productDetail {
+                
                 Text(productDetail.name)
-                Text(productDetail.availability)
                 Text(productDetail.manufacturer)
                 Text(productDetail.formattedPrice)
                 Text("\(productDetail.currentStock)")
-            } else {
+                
+                if presenter.isUserLoggedIn {
+                    presenter.addToCartView(for: productDetail.product)
+                }
+                
+            } else{
                 ProgressView("Loading...")
             }
         }
@@ -32,7 +37,8 @@ struct ProductDetailView: View {
 }
 
 #Preview {
-    let interactor = ProductDetailInteractor()
+    let loginInteractor = LoginInteractor()
+    let interactor = ProductDetailInteractor(loginInteractor: loginInteractor)
     let router = ProductDetailRouter()
     let presenter = ProductDetailPresenter(interactor: interactor, router: router)
     

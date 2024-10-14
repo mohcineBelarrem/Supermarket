@@ -40,7 +40,6 @@ class ProductDetailPresenter: ProductDetailPresenterProtocol {
                                                    name: $0.name,
                                                    category: $0.category,
                                                    inStock: $0.inStock,
-                                                   availability:  $0.inStock ? "Available" : "Out of Stock",
                                                    formattedPrice: "$\($0.price)",
                                                    currentStock: $0.currentStock,
                                                    manufacturer: $0.manufacturer)

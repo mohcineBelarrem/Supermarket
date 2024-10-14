@@ -12,12 +12,11 @@ struct ProductDetailPresentationModel: Identifiable {
     let name: String
     let category: String
     let inStock: Bool
-    let availability: String
     let formattedPrice: String
     let currentStock: Int
     let manufacturer: String
     
     var product: ProductPresentationModel {
-        .init(id: id, name: name, category: category, inStock: inStock, availability: availability)
+        .init(id: id, name: name, category: category, inStock: inStock)
     }
 }

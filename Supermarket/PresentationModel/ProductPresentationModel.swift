@@ -10,5 +10,4 @@ struct ProductPresentationModel: Identifiable {
     let name: String
     let category: String
     let inStock: Bool
-    let availability: String
 }

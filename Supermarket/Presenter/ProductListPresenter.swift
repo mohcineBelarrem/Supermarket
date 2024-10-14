@@ -33,8 +33,7 @@ class ProductListPresenter: ObservableObject {
                                               products: products.map { ProductPresentationModel(id: $0.id,
                                                                                                 name: $0.name,
                                                                                                 category: $0.category,
-                                                                                                inStock: $0.inStock,
-                                                                                                availability: $0.inStock ? "Available" : "Out of Stock")}
+                                                                                                inStock: $0.inStock)}
                     )
                 }
             }

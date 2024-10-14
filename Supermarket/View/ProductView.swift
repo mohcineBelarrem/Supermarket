@@ -13,12 +13,12 @@ struct ProductView: View {
         VStack(alignment: .leading) {
             Text(product.name)
                 .font(.headline)
-            Text(product.availability)
+            Text(product.inStock.availability)
                 .foregroundColor(product.inStock ? .green : .red)
         }
     }
 }
 
 #Preview {
-    ProductView(product: .init(id: 1, name: "Banana", category: "Fruits", inStock: true, availability: "Available"))
+    ProductView(product: .init(id: 1, name: "Banana", category: "Fruits", inStock: true))
 }

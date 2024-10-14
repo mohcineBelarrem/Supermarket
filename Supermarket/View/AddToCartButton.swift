@@ -36,7 +36,6 @@ struct AddToCartButton: View {
     let product: ProductPresentationModel = .init(id: 1709,
                                                   name: "Some Product",
                                                   category: "Some Category",
-                                                  inStock: true,
-                                                  availability: "")
+                                                  inStock: true)
     AddToCartButton(presenter: presenter, product: product)
 }

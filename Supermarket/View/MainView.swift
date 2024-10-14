@@ -19,6 +19,11 @@ struct MainView: View {
                 .tabItem {
                     Label("Profile", systemImage: "person.crop.circle")
                 }
+            
+            CartRouter.createModule()
+                .tabItem {
+                    Label("Cart", systemImage: "cart")
+                }
         }
         .navigationBarBackButtonHidden(true)
     }

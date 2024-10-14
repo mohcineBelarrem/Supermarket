@@ -15,6 +15,8 @@ struct APIConfig {
         case products
         case productDetail(Int)
         case userRegistration
+        case createCart
+        case getCartItems(String)
         
         var rawValue: String {
             switch self {
@@ -22,6 +24,8 @@ struct APIConfig {
             case .products: return "/products"
             case .productDetail(let id): return "/products/\(id)"
             case .userRegistration: return "/api-clients"
+            case .createCart: return "/carts"
+            case .getCartItems(let id): return "/carts/\(id)/items"
             }
         }
     }

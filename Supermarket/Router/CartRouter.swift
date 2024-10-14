@@ -9,15 +9,31 @@ import SwiftUI
 
 
 protocol CartRouterProtocol {
-    static func createModule() -> AnyView
+    static func createModule(with tabController: TabController) -> AnyView
+    func goToLogin()
+    func goToProductList()
 }
 
 
 class CartRouter: CartRouterProtocol {
-    static func createModule() -> AnyView {
+    private let tabController: TabController
+    
+    init(tabController: TabController) {
+        self.tabController = tabController
+    }
+    
+    func goToLogin() {
+        tabController.switchToLoginTab()
+    }
+    
+    func goToProductList() {
+        tabController.switchToProductListTab()
+    }
+    
+    static func createModule(with tabController: TabController) -> AnyView {
         let loginInteractor = LoginInteractor()
         let cartInteractor = CartInteractor(loginInteractor: loginInteractor)
-        let router = CartRouter()
+        let router = CartRouter(tabController: tabController)
         let presenter = CartPresenter(interactor: cartInteractor, router: router)
         
         

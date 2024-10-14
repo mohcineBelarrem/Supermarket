@@ -14,6 +14,8 @@ protocol CartPresenterProtocol: ObservableObject {
     var errorMessage: String? { get }
     var isUserLoggedIn: Bool { get }
     func loadCart()
+    func goToLogin()
+    func goToProductList()
 }
 
 class CartPresenter: ObservableObject, CartPresenterProtocol {
@@ -58,6 +60,14 @@ class CartPresenter: ObservableObject, CartPresenterProtocol {
                 }
                 .store(in: &cancellables)
         }
+    }
+    
+    func goToLogin() {
+        router.goToLogin()
+    }
+    
+    func goToProductList() {
+        router.goToProductList()
     }
 }
 

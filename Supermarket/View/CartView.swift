@@ -17,12 +17,12 @@ struct CartView: View {
                     if cart.isEmpty {
                         Text("Your cart is empty.")
                         Button {
-                            
+                            presenter.goToProductList()
                         } label: {
                             Text("Shop")
                         }
                         .padding()
-                        .background(.blue)
+                        .background(.green)
                         .foregroundStyle(.white)
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
@@ -42,7 +42,7 @@ struct CartView: View {
             } else {
                 Text("You must be logged in to see the cart.")
                 Button {
-                    
+                    presenter.goToLogin()
                 } label: {
                     Text("Go to Login")
                 }
@@ -63,7 +63,8 @@ struct CartView: View {
 #Preview {
     let loginInteractor = LoginInteractor()
     let interactor = CartInteractor(loginInteractor: loginInteractor)
-    let router = CartRouter()
+    let tabController = TabController()
+    let router = CartRouter(tabController: tabController)
     let presenter = CartPresenter(interactor: interactor, router: router)
     
     CartView(presenter: presenter)

@@ -24,6 +24,7 @@ class AddToCartInteractor: AddToCartInteractorProtocol {
             .map { (cart: Cart?) in
                 return cart?.items.filter { $0.productId == productId }.first?.quantity ?? 0
             }
+            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 }

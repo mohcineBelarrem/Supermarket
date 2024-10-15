@@ -45,7 +45,7 @@ class ProductListPresenter: ObservableObject {
                     break
                 }
             }, receiveValue: { productCategories in
-                self.productCategories = productCategories
+                self.productCategories = productCategories.sorted(by: { $0.name < $1.name })
             })
             .store(in: &cancellables)
     }

@@ -12,7 +12,7 @@ struct ProductDetailView: View {
     var productId: Int
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading) {
             if let error = presenter.errorMessage {
                 Text("API is down: \(error)")
                     .font(.headline)
@@ -20,18 +20,22 @@ struct ProductDetailView: View {
             } else if let productDetail = presenter.productDetail {
                 
                 Text(productDetail.name)
-                Text(productDetail.manufacturer)
-                Text(productDetail.formattedPrice)
-                Text("\(productDetail.currentStock)")
-                
-                if presenter.isUserLoggedIn {
-                    presenter.addToCartView(for: productDetail.product)
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading) {
+                        Text(productDetail.manufacturer)
+                        Text(productDetail.formattedPrice)
+                        Text("\(productDetail.currentStock)")
+                    }
+                    Spacer()
+                    if presenter.isUserLoggedIn {
+                        presenter.addToCartView(for: productDetail.product)
+                    }
                 }
-                
             } else{
                 ProgressView("Loading...")
             }
         }
+        .padding()
         .onAppear { presenter.loadProductDetail(for: productId) }
     }
 }

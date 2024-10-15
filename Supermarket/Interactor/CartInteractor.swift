@@ -19,6 +19,7 @@ protocol CartInteractorProtocol {
 class CartInteractor: CartInteractorProtocol {
     
     private let loginInteractor: LoginInteractorProtocol
+    private var cartTask: AnyCancellable?
     
     var isUserLoggedIn: Bool {
         loginInteractor.isUserLoggedIn
@@ -36,7 +37,7 @@ class CartInteractor: CartInteractorProtocol {
         
         guard let cartId = getStoredCartId() else {
             return Future { promise in promise(.success(nil)) }
-                    .delay(for: 1.0, scheduler: RunLoop.main)
+                    .receive(on: DispatchQueue.main)
                     .eraseToAnyPublisher()
         }
         

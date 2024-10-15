@@ -11,7 +11,7 @@ import SwiftUI
 
 protocol AddToCartPresenterProtocol: ObservableObject {
     var productQuantityInCart: Int? { get }
-    func getProductQuantityInCart(for productId: Int)
+    func getProductQuantityInCart(for product: ProductPresentationModel)
 }
 
 
@@ -23,20 +23,28 @@ class AddToCartPresenter: AddToCartPresenterProtocol {
     
     @Published var errorMessage: String?
     @Published var productQuantityInCart: Int?
+    @Published var isButtonEnabled: Bool = true
+    @Published var isLoading: Bool = false
     
     init(interactor: AddToCartInteractorProtocol, router: AddToCartRouterProtocol) {
         self.interactor = interactor
         self.router = router
     }
     
-    func getProductQuantityInCart(for productId: Int) {
-        interactor.fetchProductQuantity(with: productId)
-            .sink { completion in
+    func getProductQuantityInCart(for product: ProductPresentationModel) {
+        isLoading = true
+        interactor.fetchProductQuantity(with: product.id)
+            .sink { [weak self] completion in
+                guard let self else { return }
+                self.isLoading = false
                 if case .failure(let error) = completion {
                     self.errorMessage = "Login failed: \(error.localizedDescription)"
                 }
-            } receiveValue: { quantity in
+            } receiveValue: { [weak self] quantity in
+                guard let self else { return }
+                self.isLoading = false
                 self.productQuantityInCart = quantity
+                self.isButtonEnabled = quantity != nil && product.inStock
             }
             .store(in: &cancellables)
     }

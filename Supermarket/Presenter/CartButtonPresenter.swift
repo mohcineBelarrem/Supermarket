@@ -1,5 +1,5 @@
 //
-//  AddToCartPresenter.swift
+//  CartButtonPresenter.swift
 //  Supermarket
 //
 //  Created by Mohcine on 14/10/2024.
@@ -9,15 +9,15 @@ import Foundation
 import Combine
 import SwiftUI
 
-protocol AddToCartPresenterProtocol: ObservableObject {
+protocol CartButtonPresenterProtocol: ObservableObject {
     var productQuantityInCart: Int? { get }
     func getProductQuantityInCart(for product: ProductPresentationModel)
 }
 
 
-class AddToCartPresenter: AddToCartPresenterProtocol {
-    private let interactor: AddToCartInteractorProtocol
-    private let router: AddToCartRouterProtocol
+class CartButtonPresenter: CartButtonPresenterProtocol {
+    private let interactor: CartButtonInteractorProtocol
+    private let router: CartButtonRouterProtocol
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -26,7 +26,7 @@ class AddToCartPresenter: AddToCartPresenterProtocol {
     @Published var isButtonEnabled: Bool = true
     @Published var isLoading: Bool = false
     
-    init(interactor: AddToCartInteractorProtocol, router: AddToCartRouterProtocol) {
+    init(interactor: CartButtonInteractorProtocol, router: CartButtonRouterProtocol) {
         self.interactor = interactor
         self.router = router
     }

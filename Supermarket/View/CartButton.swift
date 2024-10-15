@@ -7,12 +7,14 @@
 
 import SwiftUI
 
-struct AddToCartButton: View {
-    @ObservedObject var presenter: AddToCartPresenter
+struct CartButton: View {
+    @ObservedObject var presenter: CartButtonPresenter
     var product: ProductPresentationModel
+    @State private var isShowingModal = false
     var body: some View {
         Button {
             print("Buying \(product.name)")
+            isShowingModal.toggle()
         } label: {
             
             HStack(alignment: .center) {
@@ -35,6 +37,10 @@ struct AddToCartButton: View {
             .foregroundStyle(.white)
             //.font(.system(size: 20, weight: .bold))
             .cornerRadius(8)
+            .sheet(isPresented: $isShowingModal) {
+                EmptyView()
+                    .presentationDetents([.medium])
+            }
         }
         .disabled(!presenter.isButtonEnabled)
         .onAppear {
@@ -44,5 +50,5 @@ struct AddToCartButton: View {
 }
 
 #Preview {
-    AddToCartRouter.createModule(with: .init(id: 1709, name: "Some Product", category: "Category", inStock: true))
+    CartButtonRouter.createModule(with: .init(id: 1709, name: "Some Product", category: "Category", inStock: true))
 }

@@ -25,6 +25,6 @@ class ProductDetailRouter: ProductDetailRouterProtocol {
     }
     
     func routeToAddtoCartButton(for product: ProductPresentationModel) -> AnyView {
-        AddToCartRouter.createModule(with: product)
+        CartButtonRouter.createModule(with: product)
     }
 }

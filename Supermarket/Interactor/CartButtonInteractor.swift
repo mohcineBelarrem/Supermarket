@@ -1,5 +1,5 @@
 //
-//  AddToCartInteractor.swift
+//  CartButtonInteractorProtocol.swift
 //  Supermarket
 //
 //  Created by Mohcine on 14/10/2024.
@@ -8,11 +8,11 @@
 import Combine
 import Foundation
 
-protocol AddToCartInteractorProtocol {
+protocol CartButtonInteractorProtocol {
     func fetchProductQuantity(with productId: Int) -> AnyPublisher<Int?, Error>
 }
 
-class AddToCartInteractor: AddToCartInteractorProtocol {
+class CartButtonInteractor: CartButtonInteractorProtocol {
     private let cartInteractor: CartInteractorProtocol
     
     init(cartInteractor: CartInteractorProtocol) {

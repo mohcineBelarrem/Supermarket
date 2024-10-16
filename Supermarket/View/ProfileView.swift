@@ -28,5 +28,5 @@ struct ProfileView: View {
 }
 
 #Preview {
-    ProfileView(user: .init(username: "Hamid", email: "Hamid@free.com", accessToken: "asdasd"))
+    ProfileView(user: UserPresentationModel.dummyUser)
 }

@@ -20,5 +20,5 @@ struct ProductView: View {
 }
 
 #Preview {
-    ProductView(product: .init(id: 1, name: "Banana", category: "Fruits", inStock: true))
+    ProductView(product: ProductPresentationModel.dummyProduct)
 }

@@ -58,9 +58,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    let interactor = LoginInteractor()
-    let router = LoginRouter()
-    let presenter = LoginPresenter(interactor: interactor, router: router)
-    
-    LoginView(presenter: presenter)
+    LoginRouter.createModule()
 }

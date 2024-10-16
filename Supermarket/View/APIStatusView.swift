@@ -36,9 +36,5 @@ struct APIStatusView: View {
 }
 
 #Preview {
-    let interactor = APIStatusInteractor()
-    let router = APIStatusRouter()
-    let presenter = APIStatusPresenter(interactor: interactor, router: router)
-    
-    APIStatusView(presenter: presenter)
+    APIStatusRouter.createModule()
 }

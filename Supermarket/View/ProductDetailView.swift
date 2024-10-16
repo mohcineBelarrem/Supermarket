@@ -41,10 +41,5 @@ struct ProductDetailView: View {
 }
 
 #Preview {
-    let loginInteractor = LoginInteractor()
-    let interactor = ProductDetailInteractor(loginInteractor: loginInteractor)
-    let router = ProductDetailRouter()
-    let presenter = ProductDetailPresenter(interactor: interactor, router: router)
-    
-    ProductDetailView(presenter: presenter, productId: 4643)
+    ProductDetailRouter.createModule(with: 4643)
 }

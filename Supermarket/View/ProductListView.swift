@@ -42,9 +42,5 @@ struct ProductListView: View {
 }
 
 #Preview {
-    let interactor = ProductListInteractor()
-    let router = ProductListRouter()
-    let presenter = ProductListPresenter(interactor: interactor, router: router)
-    
-    ProductListView(presenter: presenter)
+    ProductListRouter.createModule()
 }

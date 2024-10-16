@@ -61,11 +61,5 @@ struct CartView: View {
 }
 
 #Preview {
-    let loginInteractor = LoginInteractor()
-    let interactor = CartInteractor(loginInteractor: loginInteractor)
-    let tabController = TabController()
-    let router = CartRouter(tabController: tabController)
-    let presenter = CartPresenter(interactor: interactor, router: router)
-    
-    CartView(presenter: presenter)
+    CartRouter.createModule(with: TabController())
 }

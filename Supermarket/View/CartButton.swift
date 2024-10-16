@@ -50,5 +50,5 @@ struct CartButton: View {
 }
 
 #Preview {
-    CartButtonRouter.createModule(with: .init(id: 1709, name: "Some Product", category: "Category", inStock: true))
+    CartButtonRouter.createModule(with: ProductPresentationModel.dummyProduct)
 }

@@ -52,16 +52,24 @@ struct AddToCartView: View {
             .padding(.bottom, 20)
             
             Button {
-                
+                presenter.addProdtuctToCart(product)
             } label: {
-                Text("Add to cart")
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(.green)
-                    .foregroundStyle(.white)
-                    .font(.system(size: 20, weight: .bold))
-                    .cornerRadius(8)
+                if presenter.isLoading {
+                    ProgressView("")
+                } else if presenter.errorMessage != nil {
+                    Text("")
+                } else if let buttonQuantity = presenter.buttonQuantity {
+                    Text("\(buttonQuantity)")
+                } else {
+                    Text("Add to cart")
+                }
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(.green)
+            .foregroundStyle(.white)
+            .font(.system(size: 20, weight: .bold))
+            .cornerRadius(8)
         }
         .padding(20)
     }

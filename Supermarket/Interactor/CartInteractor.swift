@@ -12,12 +12,12 @@ protocol CartInteractorProtocol {
     var isUserLoggedIn: Bool { get }
     func fetchCart() -> AnyPublisher<Cart?, Error>
     func createCart() -> AnyPublisher<Cart?, Error>
+    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func storeCartId(with cartId: String)
     func getStoredCartId() -> String?
 }
 
 class CartInteractor: CartInteractorProtocol {
-    
     private let loginInteractor: LoginInteractorProtocol
     private var cartTask: AnyCancellable?
     
@@ -28,6 +28,38 @@ class CartInteractor: CartInteractorProtocol {
     init(loginInteractor: LoginInteractorProtocol) {
         self.loginInteractor = loginInteractor
     }
+    
+    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {
+        guard let user = loginInteractor.retrieveStoredCredentials() else { return
+            Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
+        }
+        
+        guard let cartId = getStoredCartId() else { return
+            Fail(error: AddToCartError.cartNotFound).eraseToAnyPublisher()
+        }
+        
+        guard let url = APIConfig.url(for: .getCartItems(cartId)) else { return
+            Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(user.accessToken)", forHTTPHeaderField: "Authorization")
+        
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let addedProduct: AddToCartBody = .init(productId: product.id, quantity: quantity)
+        request.httpBody = try? JSONEncoder().encode(addedProduct)
+        
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .map { $0.data }
+            .decode(type: AddToCartResponse.self, decoder: JSONDecoder())
+            .receive(on: DispatchQueue.main)
+            .eraseToAnyPublisher()
+    }
+    
+    
+    
     
     func fetchCart() -> AnyPublisher<Cart?, Error> {
         

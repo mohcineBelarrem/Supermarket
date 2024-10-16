@@ -23,12 +23,12 @@ struct ProductDetailView: View {
                 HStack(alignment: .center) {
                     VStack(alignment: .leading) {
                         Text(productDetail.manufacturer)
-                        Text(productDetail.formattedPrice)
+                        Text(productDetail.price.formattedPrice)
                         Text("\(productDetail.currentStock)")
                     }
                     Spacer()
                     if presenter.isUserLoggedIn {
-                        presenter.addToCartView(for: productDetail.product)
+                        presenter.addToCartView(for: productDetail)
                     }
                 }
             } else{

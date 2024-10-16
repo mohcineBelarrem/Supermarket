@@ -11,7 +11,7 @@ import SwiftUI
 
 protocol ProductDetailRouterProtocol {
     static func createModule(with id: Int) -> AnyView
-    func routeToAddtoCartButton(for product: ProductPresentationModel) -> AnyView
+    func routeToAddtoCartButton(for product: ProductDetailPresentationModel) -> AnyView
 }
 
 class ProductDetailRouter: ProductDetailRouterProtocol {
@@ -24,7 +24,7 @@ class ProductDetailRouter: ProductDetailRouterProtocol {
         return AnyView(ProductDetailView(presenter: presenter, productId: id))
     }
     
-    func routeToAddtoCartButton(for product: ProductPresentationModel) -> AnyView {
+    func routeToAddtoCartButton(for product: ProductDetailPresentationModel) -> AnyView {
         CartButtonRouter.createModule(with: product)
     }
 }

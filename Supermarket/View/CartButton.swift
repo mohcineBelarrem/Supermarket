@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CartButton: View {
     @ObservedObject var presenter: CartButtonPresenter
-    var product: ProductPresentationModel
+    var product: ProductDetailPresentationModel
     @State private var isShowingModal = false
     var body: some View {
         Button {
@@ -35,10 +35,10 @@ struct CartButton: View {
             .padding(10)
             .background(presenter.isButtonEnabled ? .green : .gray)
             .foregroundStyle(.white)
-            //.font(.system(size: 20, weight: .bold))
             .cornerRadius(8)
             .sheet(isPresented: $isShowingModal) {
-                EmptyView()
+                AddToCartViewRouter.createModule(with: product)
+                    .foregroundStyle(.black)
                     .presentationDetents([.medium])
             }
         }
@@ -50,5 +50,5 @@ struct CartButton: View {
 }
 
 #Preview {
-    CartButtonRouter.createModule(with: ProductPresentationModel.dummyProduct)
+    CartButtonRouter.createModule(with: ProductDetailPresentationModel.dummyProduct)
 }

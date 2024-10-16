@@ -9,11 +9,11 @@ import SwiftUI
 
 
 protocol CartButtonRouterProtocol {
-    static func createModule(with product: ProductPresentationModel) -> AnyView
+    static func createModule(with product: ProductDetailPresentationModel) -> AnyView
 }
 
 class CartButtonRouter: CartButtonRouterProtocol {
-    static func createModule(with product: ProductPresentationModel) -> AnyView {
+    static func createModule(with product: ProductDetailPresentationModel) -> AnyView {
         let loginInteractor = LoginInteractor()
         let cartInteractor = CartInteractor(loginInteractor: loginInteractor)
         let interactor = CartButtonInteractor(cartInteractor: cartInteractor)

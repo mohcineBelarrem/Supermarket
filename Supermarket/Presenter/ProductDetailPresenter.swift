@@ -12,7 +12,7 @@ import SwiftUI
 protocol ProductDetailPresenterProtocol: ObservableObject {
     var isUserLoggedIn: Bool { get }
     func loadProductDetail(for productId: Int)
-    func addToCartView(for product: ProductPresentationModel) -> AnyView
+    func addToCartView(for product: ProductDetailPresentationModel) -> AnyView
 }
 
 
@@ -40,7 +40,7 @@ class ProductDetailPresenter: ProductDetailPresenterProtocol {
                                                    name: $0.name,
                                                    category: $0.category,
                                                    inStock: $0.inStock,
-                                                   formattedPrice: "$\($0.price)",
+                                                   price: $0.price,
                                                    currentStock: $0.currentStock,
                                                    manufacturer: $0.manufacturer)
             }
@@ -57,7 +57,7 @@ class ProductDetailPresenter: ProductDetailPresenterProtocol {
             .store(in: &cancellables)
     }
     
-    func addToCartView(for product: ProductPresentationModel) -> AnyView {
+    func addToCartView(for product: ProductDetailPresentationModel) -> AnyView {
         router.routeToAddtoCartButton(for: product)
     }
 }

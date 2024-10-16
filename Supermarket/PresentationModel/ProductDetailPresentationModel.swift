@@ -12,7 +12,7 @@ struct ProductDetailPresentationModel: Identifiable {
     let name: String
     let category: String
     let inStock: Bool
-    let formattedPrice: String
+    let price: Double
     let currentStock: Int
     let manufacturer: String
     
@@ -21,6 +21,6 @@ struct ProductDetailPresentationModel: Identifiable {
     }
     
     static var dummyProduct: Self {
-        .init(id: 1, name: "L'or Capsules", category: "Coffee", inStock: true, formattedPrice: "45 Dirhams", currentStock: 10, manufacturer: "L'or Inc")
+        .init(id: 1, name: "L'or Capsules", category: "Coffee", inStock: true, price: 45.09, currentStock: 10, manufacturer: "L'or Inc")
     }
 }

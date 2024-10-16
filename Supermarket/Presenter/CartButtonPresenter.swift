@@ -11,7 +11,7 @@ import SwiftUI
 
 protocol CartButtonPresenterProtocol: ObservableObject {
     var productQuantityInCart: Int? { get }
-    func getProductQuantityInCart(for product: ProductPresentationModel)
+    func getProductQuantityInCart(for product: ProductDetailPresentationModel)
 }
 
 
@@ -31,7 +31,7 @@ class CartButtonPresenter: CartButtonPresenterProtocol {
         self.router = router
     }
     
-    func getProductQuantityInCart(for product: ProductPresentationModel) {
+    func getProductQuantityInCart(for product: ProductDetailPresentationModel) {
         isLoading = true
         interactor.fetchProductQuantity(with: product.id)
             .sink { [weak self] completion in

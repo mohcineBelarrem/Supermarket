@@ -53,6 +53,7 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
     }
     
     func logout() {
+        //TODO: Clear cartId also
         interactor.clearStoredCredentials()
         user = nil
     }

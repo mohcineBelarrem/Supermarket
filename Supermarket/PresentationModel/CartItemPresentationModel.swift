@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CartPresentationModel {
+struct CartPresentationModel: Codable {
     let cartId: String
     let items: [CartItemPresentationModel]
     
@@ -19,7 +19,7 @@ struct CartPresentationModel {
     }
 }
 
-struct CartItemPresentationModel: Identifiable {
+struct CartItemPresentationModel: Identifiable, Codable {
     let id: Int
     let productId: Int
     let quantity: Int

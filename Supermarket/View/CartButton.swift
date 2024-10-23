@@ -19,21 +19,16 @@ struct CartButton: View {
             
             HStack(alignment: .center) {
                 
-                if presenter.isLoading {
-                    ProgressView(" ")
-                } else if let _ = presenter.errorMessage {
-                    Text("")
+                if let quantity = presenter.productQuantityInCart, quantity > 0 {
+                    Text("\(quantity)")
                 } else {
-                    if let quantity = presenter.productQuantityInCart, quantity > 0 {
-                        Text("\(quantity)")
-                    } else {
-                        Image(systemName: "cart")
-                    }
+                    Image(systemName: "cart")
                 }
+                
             }
             .frame(width: 24, height: 24)
             .padding(10)
-            .background(presenter.isButtonEnabled ? .green : .gray)
+            .background(presenter.isButtonEnabled(for: product) ? .green : .gray)
             .foregroundStyle(.white)
             .cornerRadius(8)
             .sheet(isPresented: $isShowingModal) {
@@ -42,9 +37,9 @@ struct CartButton: View {
                     .presentationDetents([.medium])
             }
         }
-        .disabled(!presenter.isButtonEnabled)
+        .disabled(!presenter.isButtonEnabled(for: product))
         .onAppear {
-            presenter.getProductQuantityInCart(for: product)
+            presenter.subscribeForQuantity(for: product)
         }
     }
 }

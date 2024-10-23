@@ -11,6 +11,7 @@ import SwiftUI
 
 protocol AddToCartViewPresenterProtocol: ObservableObject {
     var quantity: Int { get set }
+    var buttonQuantity: Int? { get }
     func quantityRange(for product: ProductDetailPresentationModel) -> ClosedRange<Int>
     func totalFormattedPrice(for product: ProductDetailPresentationModel) -> String
     func addProdtuctToCart(_ product: ProductDetailPresentationModel)
@@ -26,7 +27,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     @Published var errorMessage: String?
     @Published var quantity: Int = 1
     @Published var isLoading: Bool = false
-    @Published var buttonQuantity: Int?
+    @Published var buttonQuantity: Int? = nil
     
     
     init(interactor: CartInteractorProtocol, router: AddToCartViewRouterProtocol) {
@@ -37,6 +38,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     func addProdtuctToCart(_ product: ProductDetailPresentationModel) {
         isLoading = true
         interactor.addProductToCart(product.product, with: quantity)
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }
                 self.isLoading = false
@@ -47,7 +49,8 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                 guard let self = self else { return }
                 self.isLoading = false
                 if response.created {
-                    self.buttonQuantity = self.quantity
+                    self.buttonQuantity = quantity
+                    interactor.addItemToCart(with: response.itemId, productId: product.id, quantity: quantity)
                 }
             }
             .store(in: &cancellables)

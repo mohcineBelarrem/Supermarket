@@ -14,9 +14,7 @@ protocol CartButtonRouterProtocol {
 
 class CartButtonRouter: CartButtonRouterProtocol {
     static func createModule(with product: ProductDetailPresentationModel) -> AnyView {
-        let loginInteractor = LoginInteractor()
-        let cartInteractor = CartInteractor(loginInteractor: loginInteractor)
-        let interactor = CartButtonInteractor(cartInteractor: cartInteractor)
+        let interactor = CartButtonInteractor()
         let router = CartButtonRouter()
         let presenter = CartButtonPresenter(interactor: interactor, router: router)
 

@@ -15,11 +15,15 @@ protocol CartInteractorProtocol {
     func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func storeCartId(with cartId: String)
     func getStoredCartId() -> String?
+    func addItemToCart(with itemId: Int, productId: Int, quantity: Int)
 }
 
 class CartInteractor: CartInteractorProtocol {
+    private var cartDefaults = UserDefaultsPublisher<CartPresentationModel>(userDefaults: .standard, key: "cart")
     private let loginInteractor: LoginInteractorProtocol
-    private var cartTask: AnyCancellable?
+    
+    @Published var cart: CartPresentationModel?
+    private var cancellables = Set<AnyCancellable>()
     
     var isUserLoggedIn: Bool {
         loginInteractor.isUserLoggedIn
@@ -27,6 +31,20 @@ class CartInteractor: CartInteractorProtocol {
     
     init(loginInteractor: LoginInteractorProtocol) {
         self.loginInteractor = loginInteractor
+        
+        cartDefaults.publisher
+            .sink { [weak self] cart in
+                self?.cart = cart
+            }
+            .store(in: &cancellables)
+    }
+    
+    func addItemToCart(with itemId: Int, productId: Int, quantity: Int) {
+        if let cart = cartDefaults.getLatestValue() {
+            let newItems = cart.items.map { CartItem(id: $0.id, productId: $0.productId, quantity: $0.quantity)} + [(.init(id: itemId, productId: productId, quantity: quantity))]
+            let newCart = CartPresentationModel(Cart(cartId: cart.cartId, items: newItems))
+            cartDefaults.save(newCart)
+        }
     }
     
     func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {
@@ -83,8 +101,11 @@ class CartInteractor: CartInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: [CartItem].self, decoder: JSONDecoder())
-            .map { (cartItems: [CartItem]) in
-                Cart(cartId: cartId, items: cartItems)
+            .map { [weak self] (cartItems: [CartItem]) in
+                guard let self else { return .init(cartId: "", items: []) }
+                let cart = Cart(cartId: cartId, items: cartItems)
+                self.cartDefaults.save(.init(cart))
+                return cart
             }
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
@@ -108,9 +129,12 @@ class CartInteractor: CartInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: CartCreationResponse.self, decoder: JSONDecoder())
-            .map { cartCreationResponse in
+            .map { [weak self] cartCreationResponse in
+                guard let self = self else { return .init(cartId: "", items: []) }
                 if cartCreationResponse.created {
-                    return Cart(cartId: cartCreationResponse.cartId, items: [])
+                    let cart = Cart(cartId: cartCreationResponse.cartId, items: [])
+                    self.cartDefaults.save(.init(cart))
+                    return cart
                 }
                 return nil
             }

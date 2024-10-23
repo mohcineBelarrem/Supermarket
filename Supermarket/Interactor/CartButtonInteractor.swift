@@ -9,22 +9,30 @@ import Combine
 import Foundation
 
 protocol CartButtonInteractorProtocol {
-    func fetchProductQuantity(with productId: Int) -> AnyPublisher<Int?, Error>
+    func listenToCartForProduct(withId produtId: Int)
+    var productQuantityInCartPublisher: Published<Int?>.Publisher { get }
 }
 
 class CartButtonInteractor: CartButtonInteractorProtocol {
-    private let cartInteractor: CartInteractorProtocol
+    private var cartDefaults = UserDefaultsPublisher<CartPresentationModel>(userDefaults: .standard, key: "cart")
     
-    init(cartInteractor: CartInteractorProtocol) {
-        self.cartInteractor = cartInteractor
+    @Published var productQuantityInCart: Int?
+    private var cancellables = Set<AnyCancellable>()
+    
+    
+    var productQuantityInCartPublisher: Published<Int?>.Publisher {
+      $productQuantityInCart
     }
     
-    func fetchProductQuantity(with productId: Int) -> AnyPublisher<Int?, any Error> {
-        return cartInteractor.fetchCart()
-            .map { (cart: Cart?) in
-                return cart?.items.filter { $0.productId == productId }.first?.quantity ?? 0
-            }
+    init() { }
+    
+    func listenToCartForProduct(withId produtId: Int) {
+        cartDefaults.publisher
             .receive(on: DispatchQueue.main)
-            .eraseToAnyPublisher()
+            .sink { [weak self] cart in
+            guard let self = self else { return }
+                self.productQuantityInCart =  cart?.items.filter { $0.productId == produtId }.first?.quantity
+            }
+            .store(in: &cancellables)
+        }
     }
-}

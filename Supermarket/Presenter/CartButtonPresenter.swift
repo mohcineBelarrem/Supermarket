@@ -11,7 +11,8 @@ import SwiftUI
 
 protocol CartButtonPresenterProtocol: ObservableObject {
     var productQuantityInCart: Int? { get }
-    func getProductQuantityInCart(for product: ProductDetailPresentationModel)
+    func subscribeForQuantity(for product: ProductDetailPresentationModel)
+    func isButtonEnabled(for product: ProductDetailPresentationModel) -> Bool
 }
 
 
@@ -23,29 +24,27 @@ class CartButtonPresenter: CartButtonPresenterProtocol {
     
     @Published var errorMessage: String?
     @Published var productQuantityInCart: Int?
-    @Published var isButtonEnabled: Bool = true
-    @Published var isLoading: Bool = false
     
     init(interactor: CartButtonInteractorProtocol, router: CartButtonRouterProtocol) {
         self.interactor = interactor
         self.router = router
     }
     
-    func getProductQuantityInCart(for product: ProductDetailPresentationModel) {
-        isLoading = true
-        interactor.fetchProductQuantity(with: product.id)
-            .sink { [weak self] completion in
-                guard let self else { return }
-                self.isLoading = false
-                if case .failure(let error) = completion {
-                    self.errorMessage = "Login failed: \(error.localizedDescription)"
-                }
-            } receiveValue: { [weak self] quantity in
-                guard let self else { return }
-                self.isLoading = false
-                self.productQuantityInCart = quantity
-                self.isButtonEnabled = quantity != nil && product.inStock
-            }
-            .store(in: &cancellables)
+    func isButtonEnabled(for product: ProductDetailPresentationModel) -> Bool {
+         product.inStock
+    }
+    
+    func subscribeForQuantity(for product: ProductDetailPresentationModel) {
+        
+//        if !isSubscribed {
+            interactor.listenToCartForProduct(withId: product.id)
+            
+            interactor.productQuantityInCartPublisher
+                .receive(on: DispatchQueue.main)
+                .assign(to: \.productQuantityInCart, on: self)
+                .store(in: &cancellables)
+            
+//            isSubscribed = true
+//        }
     }
 }

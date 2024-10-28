@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProductListView: View {
-    @ObservedObject var presenter: ProductListPresenter
+    @StateObject var presenter: ProductListPresenter
     
     var body: some View {
         NavigationView {
@@ -33,7 +33,7 @@ struct ProductListView: View {
                 }
             }
         }
-        .onAppear {
+        .task {
             if presenter.productCategories.isEmpty {
                 presenter.viewDidLoad()
             }

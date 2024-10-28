@@ -22,7 +22,6 @@ class ProductListInteractor: ProductListInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: url)
             .map { $0.data }
             .decode(type: [Product].self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 }

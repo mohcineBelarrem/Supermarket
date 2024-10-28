@@ -25,6 +25,7 @@ class ProductListPresenter: ObservableObject {
     
     func viewDidLoad() {
         interactor.fetchProducts()
+            .receive(on: DispatchQueue.main)
             .map { (products : [Product]) in
                 let categories = Dictionary(grouping: products, by: {$0.category})
                 return categories.map { (category: String, products: [Product]) in

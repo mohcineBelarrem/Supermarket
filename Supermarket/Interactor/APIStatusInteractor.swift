@@ -23,7 +23,6 @@ class APIStatusInteractor: APIStatusInteractorProtocol {
             .map { $0.data }
             .decode(type: APIStatus.self, decoder: JSONDecoder())
             .map { $0.status == "UP" }
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct APIStatusView: View {
-    @ObservedObject var presenter: APIStatusPresenter
+    @StateObject var presenter: APIStatusPresenter
 
     var body: some View {
         NavigationStack {

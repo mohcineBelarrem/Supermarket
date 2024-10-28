@@ -27,6 +27,7 @@ class APIStatusPresenter: ObservableObject {
 
     func checkAPIStatus() {
         interactor.checkAPIStatus()
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { completion in
                 if case .failure(let error) = completion {
                     self.errorMessage = error.localizedDescription

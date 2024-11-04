@@ -50,7 +50,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                 self.isLoading = false
                 if response.created {
                     self.buttonQuantity = quantity
-                    interactor.addItemToCart(with: response.itemId, productId: product.id, quantity: quantity)
+                    //interactor.addItemToCart(with: response.itemId, productId: product.id, quantity: quantity)
                 }
             }
             .store(in: &cancellables)

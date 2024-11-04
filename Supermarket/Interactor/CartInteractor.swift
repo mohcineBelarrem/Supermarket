@@ -16,18 +16,18 @@ protocol CartInteractorProtocol {
     func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func storeCartId(with cartId: String)
     func getStoredCartId() -> String?
-    func addItemToCart(with itemId: Int, productId: Int, quantity: Int)
+    //func addItemToCart(with itemId: Int, productId: Int, quantity: Int)
     func deleteItemFromCart(with itemCartId: Int) -> AnyPublisher<Bool, Error>
 }
 
 class CartInteractor: CartInteractorProtocol {
-    private var cartDefaults = UserDefaultsPublisher<CartPresentationModel>(userDefaults: .standard, key: "cart")
+    //private var cartDefaults = UserDefaultsPublisher<CartPresentationModel>(userDefaults: .standard, key: "cart")
     private let loginInteractor: LoginInteractorProtocol
     private let productListInteractor: ProductListInteractorProtocol
     
     
     @Published var cart: CartPresentationModel?
-    private var cancellables = Set<AnyCancellable>()
+//    private var cancellables = Set<AnyCancellable>()
     
     var isUserLoggedIn: Bool {
         loginInteractor.isUserLoggedIn
@@ -37,24 +37,24 @@ class CartInteractor: CartInteractorProtocol {
         self.loginInteractor = loginInteractor
         self.productListInteractor = productListInteractor
         
-        cartDefaults.publisher
-            .sink { [weak self] cart in
-                self?.cart = cart
-            }
-            .store(in: &cancellables)
+//        cartDefaults.publisher
+//            .sink { [weak self] cart in
+//                self?.cart = cart
+//            }
+//            .store(in: &cancellables)
     }
     
     func fetchProducts() -> AnyPublisher<[Product], Error> {
         productListInteractor.fetchProducts()
     }
     
-    func addItemToCart(with itemId: Int, productId: Int, quantity: Int) {
-        if let cart = cartDefaults.getLatestValue() {
-            let newItems = cart.items.map { CartItem(id: $0.id, productId: $0.productId, quantity: $0.quantity)} + [(.init(id: itemId, productId: productId, quantity: quantity))]
-            let newCart = CartPresentationModel(Cart(cartId: cart.cartId, items: newItems))
-            cartDefaults.save(newCart)
-        }
-    }
+//    func addItemToCart(with itemId: Int, productId: Int, quantity: Int) {
+//        if let cart = cartDefaults.getLatestValue() {
+//            let newItems = cart.items.map { CartItem(id: $0.id, productId: $0.productId, quantity: $0.quantity)} + [(.init(id: itemId, productId: productId, quantity: quantity))]
+//            let newCart = CartPresentationModel(Cart(cartId: cart.cartId, items: newItems))
+//            cartDefaults.save(newCart)
+//        }
+//    }
     
     func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {
         guard let user = loginInteractor.retrieveStoredCredentials() else { return
@@ -111,7 +111,7 @@ class CartInteractor: CartInteractorProtocol {
             .map { [weak self] (cartItems: [CartItem]) in
                 guard let self else { return .init(cartId: "", items: []) }
                 let cart = Cart(cartId: cartId, items: cartItems)
-                self.cartDefaults.save(.init(cart))
+                //self.cartDefaults.save(.init(cart))
                 return cart
             }
             .eraseToAnyPublisher()
@@ -139,7 +139,7 @@ class CartInteractor: CartInteractorProtocol {
                 guard let self = self else { return .init(cartId: "", items: []) }
                 if cartCreationResponse.created {
                     let cart = Cart(cartId: cartCreationResponse.cartId, items: [])
-                    self.cartDefaults.save(.init(cart))
+                    //self.cartDefaults.save(.init(cart))
                     return cart
                 }
                 return nil

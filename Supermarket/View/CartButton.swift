@@ -8,19 +8,19 @@
 import SwiftUI
 
 struct CartButton: View {
-    @ObservedObject var presenter: CartButtonPresenter
+    @StateObject var presenter: CartButtonPresenter
     var product: ProductDetailPresentationModel
-    @State private var isShowingModal = false
     var body: some View {
         Button {
-            print("Buying \(product.name)")
-            isShowingModal.toggle()
+            presenter.isShowingAddToCartView.toggle()
         } label: {
             
             HStack(alignment: .center) {
                 
                 if let quantity = presenter.productQuantityInCart, quantity > 0 {
                     Text("\(quantity)")
+                } else if presenter.isLoading {
+                    ProgressView()
                 } else {
                     Image(systemName: "cart")
                 }
@@ -31,7 +31,7 @@ struct CartButton: View {
             .background(presenter.isButtonEnabled(for: product) ? .green : .gray)
             .foregroundStyle(.white)
             .cornerRadius(8)
-            .sheet(isPresented: $isShowingModal) {
+            .sheet(isPresented: $presenter.isShowingAddToCartView) {
                 AddToCartViewRouter.createModule(with: product)
                     .foregroundStyle(.black)
                     .presentationDetents([.medium])
@@ -39,7 +39,7 @@ struct CartButton: View {
         }
         .disabled(!presenter.isButtonEnabled(for: product))
         .onAppear {
-            presenter.subscribeForQuantity(for: product)
+            presenter.fetchQuantity(for: product)
         }
     }
 }

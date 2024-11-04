@@ -32,7 +32,8 @@ class CartRouter: CartRouterProtocol {
     
     static func createModule(with tabController: TabController) -> AnyView {
         let loginInteractor = LoginInteractor()
-        let cartInteractor = CartInteractor(loginInteractor: loginInteractor)
+        let productListInteractor = ProductListInteractor()
+        let cartInteractor = CartInteractor(loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let router = CartRouter(tabController: tabController)
         let presenter = CartPresenter(interactor: cartInteractor, router: router)
         

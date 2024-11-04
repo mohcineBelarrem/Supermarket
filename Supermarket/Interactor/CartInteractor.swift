@@ -11,6 +11,7 @@ import Combine
 protocol CartInteractorProtocol {
     var isUserLoggedIn: Bool { get }
     func fetchCart() -> AnyPublisher<Cart?, Error>
+    func fetchProducts() -> AnyPublisher<[Product], Error>
     func createCart() -> AnyPublisher<Cart?, Error>
     func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func storeCartId(with cartId: String)
@@ -21,6 +22,8 @@ protocol CartInteractorProtocol {
 class CartInteractor: CartInteractorProtocol {
     private var cartDefaults = UserDefaultsPublisher<CartPresentationModel>(userDefaults: .standard, key: "cart")
     private let loginInteractor: LoginInteractorProtocol
+    private let productListInteractor: ProductListInteractorProtocol
+    
     
     @Published var cart: CartPresentationModel?
     private var cancellables = Set<AnyCancellable>()
@@ -29,14 +32,19 @@ class CartInteractor: CartInteractorProtocol {
         loginInteractor.isUserLoggedIn
     }
     
-    init(loginInteractor: LoginInteractorProtocol) {
+    init(loginInteractor: LoginInteractorProtocol, productListInteractor: ProductListInteractorProtocol) {
         self.loginInteractor = loginInteractor
+        self.productListInteractor = productListInteractor
         
         cartDefaults.publisher
             .sink { [weak self] cart in
                 self?.cart = cart
             }
             .store(in: &cancellables)
+    }
+    
+    func fetchProducts() -> AnyPublisher<[Product], Error> {
+        productListInteractor.fetchProducts()
     }
     
     func addItemToCart(with itemId: Int, productId: Int, quantity: Int) {

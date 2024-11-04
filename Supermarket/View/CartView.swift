@@ -28,7 +28,11 @@ struct CartView: View {
                         .cornerRadius(8)
                     } else {
                         List(cart.items) { item in
-                            Text("ProductId:\(item.productId) Quantity:\(item.quantity)")
+                            HStack {
+                                Text("\(item.quantity)")
+                                Spacer()
+                                Text(item.label)
+                            }
                         }
                     }
                 } else if let errorMessage = presenter.errorMessage {

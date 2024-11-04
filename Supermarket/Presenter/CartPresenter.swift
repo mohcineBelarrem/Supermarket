@@ -37,7 +37,6 @@ class CartPresenter: ObservableObject, CartPresenterProtocol {
 
     func loadCart() {
         interactor.fetchCart()
-            .receive(on: DispatchQueue.main)
             .flatMap { [weak self] cart -> AnyPublisher<Cart?, Error> in
                 guard let self else { return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher() }
                 if let cart = cart {
@@ -48,16 +47,18 @@ class CartPresenter: ObservableObject, CartPresenterProtocol {
                     return self.interactor.createCart()
                 }
             }
+            .zip(interactor.fetchProducts())
+            .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 guard let self else { return }
                 if case .failure(let error) = completion {
                     self.errorMessage = "Error fetching cart: \(error.localizedDescription)"
                 }
-            }, receiveValue: { [weak self] cart in
+            }, receiveValue: { [weak self] cart, productList in
                 guard let self else { return }
                 if let cart = cart {
                     self.interactor.storeCartId(with: cart.cartId)
-                    self.cart = CartPresentationModel(cart)
+                    self.cart = CartPresentationModel(cart, productList)
                 }
             })
             .store(in: &cancellables)

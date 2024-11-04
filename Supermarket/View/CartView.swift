@@ -32,6 +32,12 @@ struct CartView: View {
                                 Text("\(item.quantity)")
                                 Spacer()
                                 Text(item.label)
+                                Spacer()
+                                Button {
+                                    presenter.deleteCartItem(with: item.id)
+                                } label: {
+                                    Image(systemName: "trash")
+                                }
                             }
                         }
                     }
@@ -57,6 +63,11 @@ struct CartView: View {
                 .cornerRadius(8)
             }
         }
+        .alert("Oops", isPresented: $presenter.showAlert, actions: {
+            Button("Ok", role: .cancel) {}
+        }, message: {
+            Text(presenter.alertMessage)
+        })
         .padding()
         .onAppear {
             presenter.loadCart()

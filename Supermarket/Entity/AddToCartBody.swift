@@ -9,8 +9,3 @@ struct AddToCartBody: Encodable {
     let productId: Int
     let quantity: Int
 }
-
-
-enum AddToCartError: Error {
-    case cartNotFound
-}

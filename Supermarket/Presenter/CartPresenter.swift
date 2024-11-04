@@ -16,6 +16,7 @@ protocol CartPresenterProtocol: ObservableObject {
     func loadCart()
     func goToLogin()
     func goToProductList()
+    func deleteCartItem(with cartItemId: Int)
 }
 
 class CartPresenter: ObservableObject, CartPresenterProtocol {
@@ -25,6 +26,9 @@ class CartPresenter: ObservableObject, CartPresenterProtocol {
 
     @Published var cart: CartPresentationModel?
     @Published var errorMessage: String?
+   
+    @Published var alertMessage: String = ""
+    @Published var showAlert: Bool = false
     
     var isUserLoggedIn: Bool {
         interactor.isUserLoggedIn
@@ -59,6 +63,29 @@ class CartPresenter: ObservableObject, CartPresenterProtocol {
                 if let cart = cart {
                     self.interactor.storeCartId(with: cart.cartId)
                     self.cart = CartPresentationModel(cart, productList)
+                }
+            })
+            .store(in: &cancellables)
+    }
+    
+    func deleteCartItem(with cartItemId: Int) {
+        self.alertMessage = ""
+        self.showAlert = false
+        interactor.deleteItemFromCart(with: cartItemId)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                guard let self else { return }
+                if case .failure(let error) = completion {
+                    self.alertMessage = "error deleting product \(error.localizedDescription)"
+                    self.showAlert = true
+                }
+            }, receiveValue: { [weak self] success in
+                guard let self else { return }
+                if success {
+                    self.loadCart()
+                } else {
+                    self.alertMessage = "Oops there was an error deleting the product"
+                    self.showAlert = true
                 }
             })
             .store(in: &cancellables)

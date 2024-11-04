@@ -12,7 +12,7 @@ import SwiftUI
 protocol ProductDetailPresenterProtocol: ObservableObject {
     var isUserLoggedIn: Bool { get }
     func loadProductDetail(for productId: Int)
-    func addToCartView(for product: ProductDetailPresentationModel) -> AnyView
+    func addToCartButton(for product: ProductDetailPresentationModel) -> AnyView
 }
 
 
@@ -57,7 +57,7 @@ class ProductDetailPresenter: ProductDetailPresenterProtocol {
             .store(in: &cancellables)
     }
     
-    func addToCartView(for product: ProductDetailPresentationModel) -> AnyView {
+    func addToCartButton(for product: ProductDetailPresentationModel) -> AnyView {
         router.routeToAddtoCartButton(for: product)
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ProductDetailView: View {
-    @ObservedObject var presenter: ProductDetailPresenter
+    @StateObject var presenter: ProductDetailPresenter
     var productId: Int
 
     var body: some View {
@@ -28,7 +28,7 @@ struct ProductDetailView: View {
                     }
                     Spacer()
                     if presenter.isUserLoggedIn {
-                        presenter.addToCartView(for: productDetail)
+                        presenter.addToCartButton(for: productDetail)
                     }
                 }
             } else{

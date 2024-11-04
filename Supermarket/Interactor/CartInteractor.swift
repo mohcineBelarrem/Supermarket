@@ -13,10 +13,13 @@ protocol CartInteractorProtocol {
     func fetchCart() -> AnyPublisher<Cart?, Error>
     func fetchProducts() -> AnyPublisher<[Product], Error>
     func createCart() -> AnyPublisher<Cart?, Error>
-    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func storeCartId(with cartId: String)
     func getStoredCartId() -> String?
     //func addItemToCart(with itemId: Int, productId: Int, quantity: Int)
+    
+    
+    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
+    func editItemInCart(itemId: Int, with quantity: Int) -> AnyPublisher<Bool, Error>
     func deleteItemFromCart(with itemCartId: Int) -> AnyPublisher<Bool, Error>
 }
 
@@ -62,7 +65,7 @@ class CartInteractor: CartInteractorProtocol {
         }
         
         guard let cartId = getStoredCartId() else { return
-            Fail(error: AddToCartError.cartNotFound).eraseToAnyPublisher()
+            Fail(error: CartError.cartNotFound).eraseToAnyPublisher()
         }
         
         guard let url = APIConfig.url(for: .getCartItems(cartId)) else { return
@@ -84,6 +87,36 @@ class CartInteractor: CartInteractorProtocol {
             .eraseToAnyPublisher()
     }
     
+    
+    func editItemInCart(itemId: Int, with quantity: Int) -> AnyPublisher<Bool, any Error> {
+        guard let user = loginInteractor.retrieveStoredCredentials() else { return
+            Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
+        }
+        
+        guard let cartId = getStoredCartId() else { return
+            Fail(error: CartError.cartNotFound).eraseToAnyPublisher()
+        }
+        
+        guard let url = APIConfig.url(for: .editCartItem(cartId, itemId)) else { return
+            Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(user.accessToken)", forHTTPHeaderField: "Authorization")
+        
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let editCartItemBody: EditCartItemBody = .init(quantity: quantity)
+        request.httpBody = try? JSONEncoder().encode(editCartItemBody)
+        
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .tryMap {
+                guard let response = $0.response as? HTTPURLResponse else { throw CartError.badServerResponse }
+                return response.statusCode == 204
+                }
+            .eraseToAnyPublisher()
+    }
     
     
     
@@ -153,10 +186,10 @@ class CartInteractor: CartInteractorProtocol {
         }
         
         guard let cartId = getStoredCartId() else { return
-            Fail(error: DeleteProductError.cartNotFound).eraseToAnyPublisher()
+            Fail(error: CartError.cartNotFound).eraseToAnyPublisher()
         }
         
-        guard let url = APIConfig.url(for: .deletedeCartItem(cartId, itemCartId)) else { return
+        guard let url = APIConfig.url(for: .deleteCartItem(cartId, itemCartId)) else { return
             Fail(error: URLError(.badURL)).eraseToAnyPublisher()
         }
         
@@ -168,7 +201,7 @@ class CartInteractor: CartInteractorProtocol {
         
         return URLSession.shared.dataTaskPublisher(for: request)
             .tryMap {
-                guard let response = $0.response as? HTTPURLResponse else { throw DeleteProductError.badServerResponse }
+                guard let response = $0.response as? HTTPURLResponse else { throw CartError.badServerResponse }
                 return response.statusCode == 204
                 }
             .eraseToAnyPublisher()

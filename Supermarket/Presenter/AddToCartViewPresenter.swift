@@ -14,7 +14,8 @@ protocol AddToCartViewPresenterProtocol: ObservableObject {
     var buttonQuantity: Int? { get }
     func quantityRange(for product: ProductDetailPresentationModel) -> ClosedRange<Int>
     func totalFormattedPrice(for product: ProductDetailPresentationModel) -> String
-    func addProdtuctToCart(_ product: ProductDetailPresentationModel)
+    func viewDidLoad(with product: ProductDetailPresentationModel)
+    func buttonPressed(for product: ProductDetailPresentationModel)
 }
 
 
@@ -29,33 +30,61 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     @Published var isLoading: Bool = false
     @Published var buttonQuantity: Int? = nil
     
+    private var initialQuantity: Int = 0
+    
+    var isButtonEnabbled: Bool {
+        initialQuantity != quantity
+    }
+    
+    var buttonText: String {
+        if let buttonQuantity {
+            if initialQuantity > 0 {
+                return initialQuantity == quantity ? "\(buttonQuantity)" : "Update Cart (\(quantity))"
+            } else {
+                return "\(buttonQuantity)"
+            }
+        } else {
+            return "Add to Cart"
+        }
+    }
     
     init(interactor: CartInteractorProtocol, router: AddToCartViewRouterProtocol) {
         self.interactor = interactor
         self.router = router
     }
     
-    func addProdtuctToCart(_ product: ProductDetailPresentationModel) {
+    func buttonPressed(for product: ProductDetailPresentationModel) {
+        if initialQuantity > 0 {
+            editProductQuantity(product: product, with: quantity)
+        } else {
+            addProdtuctToCart(product)
+        }
+    }
+    
+    
+    func viewDidLoad(with product: ProductDetailPresentationModel) {
         isLoading = true
-        interactor.addProductToCart(product.product, with: quantity)
+        interactor.fetchCart()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }
                 self.isLoading = false
                 if case .failure(let error) = completion {
-                    self.errorMessage = "Login failed: \(error.localizedDescription)"
+                    self.errorMessage = "Adding product to Cart failed: \(error.localizedDescription)"
                 }
-            } receiveValue: { [weak self] response in
+            } receiveValue: { [weak self] cart in
                 guard let self = self else { return }
                 self.isLoading = false
-                if response.created {
+                
+                if let quantity = cart?.items.filter({ $0.productId == product.id }).first?.quantity  {
+                    self.initialQuantity = quantity
+                    self.quantity = quantity
                     self.buttonQuantity = quantity
-                    //interactor.addItemToCart(with: response.itemId, productId: product.id, quantity: quantity)
                 }
+                
             }
             .store(in: &cancellables)
     }
-    
     
     func quantityRange(for product: ProductDetailPresentationModel) -> ClosedRange<Int> {
         return 1...product.currentStock
@@ -64,6 +93,59 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     func totalFormattedPrice(for product: ProductDetailPresentationModel) -> String {
         let total = Double(quantity) * product.price
         return total.formattedPrice
+    }
+    
+    private func editProductQuantity(product: ProductDetailPresentationModel, with newQuantity: Int) {
+        isLoading = true
+        
+        interactor.fetchCart()
+            .tryMap { cart -> Int? in
+                return cart?.items.filter { $0.productId == product.id }.first?.id
+            }
+            .compactMap { $0 }
+            .flatMap{ [weak self] (cartItemId: Int) -> AnyPublisher<Bool, Error> in
+                guard let self else { return Fail(error: CartError.cartNotFound).eraseToAnyPublisher() }
+                return interactor.editItemInCart(itemId: cartItemId, with: quantity)
+            }
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                guard let self else { return }
+                self.isLoading = false
+                if case .failure(let error) = completion {
+                    self.errorMessage = "Editing product quantity failed: \(error.localizedDescription)"
+                    self.buttonQuantity = nil
+                    
+                }
+            } receiveValue: { [weak self] success in
+                guard let self else { return }
+                if success {
+                    self.initialQuantity = newQuantity
+                    self.quantity = newQuantity
+                    self.buttonQuantity = newQuantity
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func addProdtuctToCart(_ product: ProductDetailPresentationModel) {
+        isLoading = true
+        interactor.addProductToCart(product.product, with: quantity)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                guard let self else { return }
+                self.isLoading = false
+                if case .failure(let error) = completion {
+                    self.errorMessage = "Adding product to Cart failed: \(error.localizedDescription)"
+                }
+            } receiveValue: { [weak self] response in
+                guard let self = self else { return }
+                self.isLoading = false
+                if response.created {
+                    self.buttonQuantity = quantity
+                    self.initialQuantity = quantity
+                }
+            }
+            .store(in: &cancellables)
     }
     
 }

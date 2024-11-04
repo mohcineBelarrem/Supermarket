@@ -17,7 +17,8 @@ struct APIConfig {
         case userRegistration
         case createCart
         case getCartItems(String)
-        case deletedeCartItem(String, Int)
+        case deleteCartItem(String, Int)
+        case editCartItem(String, Int)
         
         var rawValue: String {
             switch self {
@@ -27,7 +28,8 @@ struct APIConfig {
             case .userRegistration: return "/api-clients"
             case .createCart: return "/carts"
             case .getCartItems(let id): return "/carts/\(id)/items"
-            case .deletedeCartItem(let cartId, let cartItemId): return "/carts/\(cartId)/items/\(cartItemId)"
+            case .deleteCartItem(let cartId, let cartItemId): return "/carts/\(cartId)/items/\(cartItemId)"
+            case .editCartItem(let cartId, let cartItemId): return "/carts/\(cartId)/items/\(cartItemId)"
             }
         }
     }

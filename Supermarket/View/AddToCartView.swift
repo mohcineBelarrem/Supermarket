@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AddToCartView: View {
-    @ObservedObject var presenter: AddToCartViewPresenter
+    @StateObject var presenter: AddToCartViewPresenter
     var product: ProductDetailPresentationModel
    
     var range: ClosedRange<Int> {
@@ -40,8 +40,6 @@ struct AddToCartView: View {
                 Spacer()
             }
             
-            
-            
             Spacer()
             
             HStack() {
@@ -52,16 +50,14 @@ struct AddToCartView: View {
             .padding(.bottom, 20)
             
             Button {
-                presenter.addProdtuctToCart(product)
+                presenter.buttonPressed(for: product)
             } label: {
                 if presenter.isLoading {
                     ProgressView("")
                 } else if presenter.errorMessage != nil {
                     Text("")
-                } else if let buttonQuantity = presenter.buttonQuantity {
-                    Text("\(buttonQuantity)")
                 } else {
-                    Text("Add to cart")
+                    Text(presenter.buttonText)
                 }
             }
             .padding()
@@ -70,8 +66,12 @@ struct AddToCartView: View {
             .foregroundStyle(.white)
             .font(.system(size: 20, weight: .bold))
             .cornerRadius(8)
+            .disabled(!presenter.isButtonEnabbled)
         }
         .padding(20)
+        .onAppear {
+            presenter.viewDidLoad(with: product)
+        }
     }
 }
 

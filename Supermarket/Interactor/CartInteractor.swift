@@ -72,7 +72,6 @@ class CartInteractor: CartInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: AddToCartResponse.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
     
@@ -87,7 +86,6 @@ class CartInteractor: CartInteractorProtocol {
         
         guard let cartId = getStoredCartId() else {
             return Future { promise in promise(.success(nil)) }
-                    .receive(on: DispatchQueue.main)
                     .eraseToAnyPublisher()
         }
         
@@ -107,7 +105,6 @@ class CartInteractor: CartInteractorProtocol {
                 self.cartDefaults.save(.init(cart))
                 return cart
             }
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 
@@ -138,7 +135,6 @@ class CartInteractor: CartInteractorProtocol {
                 }
                 return nil
             }
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 

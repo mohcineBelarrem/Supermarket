@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CartView: View {
-    @ObservedObject var presenter: CartPresenter
+    @StateObject var presenter: CartPresenter
 
     var body: some View {
         VStack {

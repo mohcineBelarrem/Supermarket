@@ -5,21 +5,21 @@
 //  Created by Mohcine on 13/10/2024.
 //
 
-import Foundation
+import SwiftData
 
-struct UserPresentationModel {
-    let username: String
-    let email: String
-    let accessToken: String
+@Model
+class UserPresentationModel {
+    var username: String
+    var email: String
+    var accessToken: String
     
-    static var dummyUser: Self {
-        .init(username: "hamid", email: "hamid@free.com", accessToken: "12345")
+    static var dummyUser: UserPresentationModel {
+        UserPresentationModel(username: "hamid", email: "hamid@free.com", accessToken: "12345")
     }
-}
-
-enum UserPresentationModelKeys: String {
-    typealias RawValue = String
-    case username
-    case email
-    case accessToken
+    
+    init(username: String, email: String, accessToken: String) {
+        self.username = username
+        self.email = email
+        self.accessToken = accessToken
+    }
 }

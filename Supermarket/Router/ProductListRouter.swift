@@ -6,11 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 
 protocol ProductListRouterProtocol {
     static func createModule() -> AnyView
-    func routeToDetailView(for product: ProductPresentationModel) -> AnyView
+    func routeToDetailView(for product: ProductPresentationModel, modelContext: ModelContext) -> AnyView
     func routeToProductView(for product: ProductPresentationModel) -> AnyView
 }
 
@@ -23,8 +24,8 @@ class ProductListRouter: ProductListRouterProtocol {
         return AnyView(ProductListView(presenter: presenter))
     }
     
-    func routeToDetailView(for product: ProductPresentationModel) -> AnyView {
-        ProductDetailRouter.createModule(with: product.id)
+    func routeToDetailView(for product: ProductPresentationModel, modelContext: ModelContext) -> AnyView {
+        ProductDetailRouter.createModule(with: product.id, modelContext: modelContext)
     }
     
     func routeToProductView(for product: ProductPresentationModel) -> AnyView {

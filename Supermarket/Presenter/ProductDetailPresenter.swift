@@ -8,11 +8,12 @@
 import Foundation
 import Combine
 import SwiftUI
+import SwiftData
 
 protocol ProductDetailPresenterProtocol: ObservableObject {
     var isUserLoggedIn: Bool { get }
     func loadProductDetail(for productId: Int)
-    func addToCartButton(for product: ProductDetailPresentationModel) -> AnyView
+    func addToCartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView
 }
 
 
@@ -57,7 +58,7 @@ class ProductDetailPresenter: ProductDetailPresenterProtocol {
             .store(in: &cancellables)
     }
     
-    func addToCartButton(for product: ProductDetailPresentationModel) -> AnyView {
-        router.routeToAddtoCartButton(for: product)
+    func addToCartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToAddtoCartButton(for: product, modelContext: modelContext)
     }
 }

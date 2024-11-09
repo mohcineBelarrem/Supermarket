@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 import Combine
 
 class ProductListPresenter: ObservableObject {
@@ -51,8 +52,8 @@ class ProductListPresenter: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func detailView(for product: ProductPresentationModel) -> AnyView {
-        router.routeToDetailView(for: product)
+    func detailView(for product: ProductPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToDetailView(for: product, modelContext: modelContext)
     }
     
     func productView(for product: ProductPresentationModel) -> AnyView {

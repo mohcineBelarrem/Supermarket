@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 
 protocol AddToCartViewRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel) -> AnyView
+    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView
 }
 
 class AddToCartViewRouter: AddToCartViewRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel) -> AnyView {
-        let loginInteractor = LoginInteractor()
+    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        let service = UserProfileService(modelContext: modelContext)
+        let loginInteractor = LoginInteractor(service: service)
         let productListInteractor = ProductListInteractor()
         let interactor = CartInteractor(loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let router = AddToCartViewRouter()

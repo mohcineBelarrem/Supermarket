@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CartView: View {
     @StateObject var presenter: CartPresenter
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         VStack {
@@ -76,5 +78,7 @@ struct CartView: View {
 }
 
 #Preview {
-    CartRouter.createModule(with: TabController())
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    CartRouter.createModule(with: TabController(),
+                            modelContext: mockModelContainer.mainContext)
 }

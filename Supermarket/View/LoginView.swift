@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LoginView: View {
     @ObservedObject var presenter: LoginPresenter
     @State private var username: String = ""
     @State private var email: String = ""
+    
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         VStack {
@@ -58,5 +61,6 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginRouter.createModule()
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    LoginRouter.createModule(with: mockModelContainer.mainContext)
 }

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct AddToCartView: View {
     @StateObject var presenter: AddToCartViewPresenter
@@ -76,5 +77,7 @@ struct AddToCartView: View {
 }
 
 #Preview {
-    AddToCartViewRouter.createModule(with: ProductDetailPresentationModel.dummyProduct)
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    AddToCartViewRouter.createModule(with: ProductDetailPresentationModel.dummyProduct,
+                                     modelContext: mockModelContainer.mainContext)
 }

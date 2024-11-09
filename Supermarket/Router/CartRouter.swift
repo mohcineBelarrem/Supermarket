@@ -6,10 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 
 protocol CartRouterProtocol {
-    static func createModule(with tabController: TabController) -> AnyView
+    static func createModule(with tabController: TabController, modelContext: ModelContext) -> AnyView
     func goToLogin()
     func goToProductList()
 }
@@ -30,8 +31,9 @@ class CartRouter: CartRouterProtocol {
         tabController.switchToProductListTab()
     }
     
-    static func createModule(with tabController: TabController) -> AnyView {
-        let loginInteractor = LoginInteractor()
+    static func createModule(with tabController: TabController, modelContext: ModelContext) -> AnyView {
+        let service = UserProfileService(modelContext: modelContext)
+        let loginInteractor = LoginInteractor(service: service)
         let productListInteractor = ProductListInteractor()
         let cartInteractor = CartInteractor(loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let router = CartRouter(tabController: tabController)

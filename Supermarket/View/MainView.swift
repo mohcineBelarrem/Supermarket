@@ -6,9 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MainView: View {
     @ObservedObject var tabController = TabController()
+    @Environment(\.modelContext) private var modelContext
+    
     var body: some View {
         TabView(selection: $tabController.selectedTab) {
             ProductListRouter.createModule()
@@ -17,13 +20,13 @@ struct MainView: View {
                 }
                 .tag(TabController.Tab.productList)
             
-            LoginRouter.createModule()
-                .tabItem {
-                    Label("Profile", systemImage: "person.crop.circle")
-                }
-                .tag(TabController.Tab.login)
+                LoginRouter.createModule(with: modelContext)
+                    .tabItem {
+                        Label("Profile", systemImage: "person.crop.circle")
+                    }
+                    .tag(TabController.Tab.login)
             
-            CartRouter.createModule(with: tabController)
+            CartRouter.createModule(with: tabController, modelContext: modelContext)
                 .tabItem {
                     Label("Cart", systemImage: "cart")
                 }

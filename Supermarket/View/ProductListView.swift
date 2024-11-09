@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ProductListView: View {
     @StateObject var presenter: ProductListPresenter
+    @Environment(\.modelContext) private var modelContext
     
     var body: some View {
         NavigationView {
@@ -23,7 +25,8 @@ struct ProductListView: View {
                         Section(header: Text(category.name)) {
                             ForEach(category.products) { product in
                                NavigationLink {
-                                    presenter.detailView(for: product)
+                                   presenter.detailView(for: product,
+                                                        modelContext: modelContext)
                                 } label: {
                                     presenter.productView(for: product)
                                 }

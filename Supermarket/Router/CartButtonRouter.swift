@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 
 protocol CartButtonRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel) -> AnyView
+    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView
 }
 
 class CartButtonRouter: CartButtonRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel) -> AnyView {
-        let loginInteractor = LoginInteractor()
+    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        let service = UserProfileService(modelContext: modelContext)
+        let loginInteractor = LoginInteractor(service: service)
         let productListInteractor = ProductListInteractor()
         let cartInteractor = CartInteractor(loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let interactor = CartButtonInteractor(cartInteractor: cartInteractor)

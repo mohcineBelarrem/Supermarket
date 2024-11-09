@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 protocol LoginRouterProtocol {
-    static func createModule() -> AnyView
+    static func createModule(with modelContext: ModelContext) -> AnyView
     func routeToProfileView(for user: UserPresentationModel) -> AnyView
 }
 
 class LoginRouter: LoginRouterProtocol {
-    static func createModule() -> AnyView {
-        let interactor = LoginInteractor()
+    static func createModule(with modelContext: ModelContext) -> AnyView {
+        let service = UserProfileService(modelContext: modelContext)
+        let interactor = LoginInteractor(service: service)
         let router = LoginRouter()
         let presenter = LoginPresenter(interactor: interactor, router: router)
         

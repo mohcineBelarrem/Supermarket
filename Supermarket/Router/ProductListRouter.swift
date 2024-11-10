@@ -19,9 +19,10 @@ class ProductListRouter: ProductListRouterProtocol {
     static func createModule(with modelContext: ModelContext) -> AnyView {
         
         let service = UserProfileService(modelContext: modelContext)
+        let productService = ProductService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: service)
         let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor)
-        let interactor = ProductListInteractor(productDetailInteractor: productDetailInteractor)
+        let interactor = ProductListInteractor(productDetailInteractor: productDetailInteractor, service: productService)
         let router = ProductListRouter()
         let presenter = ProductListPresenter(interactor: interactor, router: router)
         

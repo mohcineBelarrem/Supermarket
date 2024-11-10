@@ -11,14 +11,18 @@ import Foundation
 protocol ProductListInteractorProtocol {
     func fetchProducts() -> AnyPublisher<[Product], Error>
     func fetchProductDetail(for productId: Int) -> AnyPublisher<ProductDetail, Error>
+    func store(products: [ProductDetailPresentationModel])
+    func retrieveProducts() -> [ProductDetailPresentationModel]
+    func deleteCatalog()
 }
 
 class ProductListInteractor: ProductListInteractorProtocol {
-    
     private let productDetailInteractor: ProductDetailInteractorProtocol
+    private let service: ProductServiceProtocol
     
-    init(productDetailInteractor: ProductDetailInteractorProtocol) {
+    init(productDetailInteractor: ProductDetailInteractorProtocol, service: ProductServiceProtocol) {
         self.productDetailInteractor = productDetailInteractor
+        self.service = service
     }
     
     func fetchProducts() -> AnyPublisher<[Product], Error> {
@@ -34,5 +38,17 @@ class ProductListInteractor: ProductListInteractorProtocol {
     
     func fetchProductDetail(for productId: Int) -> AnyPublisher<ProductDetail, Error> {
         productDetailInteractor.getProductDetail(for: productId)
+    }
+    
+    func store(products: [ProductDetailPresentationModel]) {
+        service.save(products: products)
+    }
+    
+    func retrieveProducts() -> [ProductDetailPresentationModel] {
+        service.fetchProducts()
+    }
+    
+    func deleteCatalog() {
+        service.deleteProducts()
     }
 }

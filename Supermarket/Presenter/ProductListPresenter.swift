@@ -22,6 +22,7 @@ class ProductListPresenter: ObservableObject {
     init(interactor: ProductListInteractorProtocol, router: ProductListRouterProtocol) {
         self.interactor = interactor
         self.router = router
+        self.productCategories = self.regroupProductsByCategories(products: interactor.retrieveProducts())
     }
     
     func viewDidLoad() {
@@ -35,13 +36,7 @@ class ProductListPresenter: ObservableObject {
             .collect()
             .receive(on: DispatchQueue.main)
             .map { (products : [ProductDetail]) in
-                let categories = Dictionary(grouping: products, by: {$0.category})
-                return categories.map { (category: String, products: [ProductDetail]) in
-                    CategoryPresentationModel(id: UUID(),
-                                              name: category,
-                                              products: products.map { ProductDetailPresentationModel(product: $0) }
-                    )
-                }
+                return products.map { ProductDetailPresentationModel(product: $0) }
             }
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -50,8 +45,10 @@ class ProductListPresenter: ObservableObject {
                 case .finished:
                     break
                 }
-            }, receiveValue: { productCategories in
-                self.productCategories = productCategories.sorted(by: { $0.name < $1.name })
+            }, receiveValue: { [weak self] (products: [ProductDetailPresentationModel]) in
+                guard let self else { return }
+                self.interactor.store(products: products)
+                self.productCategories = self.regroupProductsByCategories(products: products)
             })
             .store(in: &cancellables)
     }
@@ -62,5 +59,15 @@ class ProductListPresenter: ObservableObject {
     
     func productView(for product: ProductDetailPresentationModel) -> AnyView {
         router.routeToProductView(for: product)
+    }
+    
+    private func regroupProductsByCategories(products: [ProductDetailPresentationModel]) -> [CategoryPresentationModel] {
+        let categories = Dictionary(grouping: products, by: {$0.category})
+        return categories.map { (category: String, products: [ProductDetailPresentationModel]) in
+            CategoryPresentationModel(id: UUID(),
+                                      name: category,
+                                      products: products
+            )
+        }.sorted(by: {$0.name < $1.name})
     }
 }

@@ -6,23 +6,29 @@
 //
 
 import Foundation
+import SwiftData
 
-struct ProductDetailPresentationModel: Identifiable {
-    let id: Int
-    let name: String
-    let category: String
-    let inStock: Bool
-    let price: Double
-    let currentStock: Int
-    let manufacturer: String
+@Model
+class ProductDetailPresentationModel {
+    var id: Int
+    var name: String
+    var category: String
+    var inStock: Bool
+    var price: Double
+    var currentStock: Int
+    var manufacturer: String
     
-    static var dummyProduct: Self {
-        .init(id: 1, name: "L'or Capsules", category: "Coffee", inStock: true, price: 45.09, currentStock: 10, manufacturer: "L'or Inc")
+    init(id: Int, name: String, category: String, inStock: Bool, price: Double, currentStock: Int, manufacturer: String) {
+        self.id = id
+        self.name = name
+        self.category = category
+        self.inStock = inStock
+        self.price = price
+        self.currentStock = currentStock
+        self.manufacturer = manufacturer
     }
-}
-
-extension ProductDetailPresentationModel {
-    init (product: ProductDetail) {
+    
+     init (product: ProductDetail) {
         self.id = product.id
         self.name = product.name
         self.category = product.category
@@ -30,5 +36,9 @@ extension ProductDetailPresentationModel {
         self.price = product.price
         self.currentStock = product.currentStock
         self.manufacturer = product.manufacturer
+    }
+    
+    static var dummyProduct: ProductDetailPresentationModel {
+        ProductDetailPresentationModel(id: 1, name: "L'or Capsules", category: "Coffee", inStock: true, price: 45.09, currentStock: 10, manufacturer: "L'or Inc")
     }
 }

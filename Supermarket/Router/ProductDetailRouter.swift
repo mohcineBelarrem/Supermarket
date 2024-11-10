@@ -17,8 +17,9 @@ protocol ProductDetailRouterProtocol {
 class ProductDetailRouter: ProductDetailRouterProtocol {
     static func createModule(with id: Int, modelContext: ModelContext) -> AnyView {
         let service = UserProfileService(modelContext: modelContext)
+        let productService = ProductService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: service)
-        let interactor = ProductDetailInteractor(loginInteractor: loginInteractor)
+        let interactor = ProductDetailInteractor(loginInteractor: loginInteractor, productService: productService)
         let router = ProductDetailRouter()
         let presenter = ProductDetailPresenter(interactor: interactor, router: router)
         

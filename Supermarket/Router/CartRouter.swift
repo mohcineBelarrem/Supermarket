@@ -35,7 +35,7 @@ class CartRouter: CartRouterProtocol {
         let service = UserProfileService(modelContext: modelContext)
         let productService = ProductService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: service)
-        let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor)
+        let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor, productService: productService)
         let productListInteractor = ProductListInteractor(productDetailInteractor: productDetailInteractor, service: productService)
         let cartInteractor = CartInteractor(loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let router = CartRouter(tabController: tabController)

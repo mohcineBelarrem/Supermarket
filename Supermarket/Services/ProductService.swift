@@ -10,6 +10,7 @@ import SwiftData
 
 protocol ProductServiceProtocol {
     func fetchProducts() -> [ProductDetailPresentationModel]
+    func fetchProduct(with id: Int) -> ProductDetailPresentationModel?
     func save(products: [ProductDetailPresentationModel])
     func deleteProducts()
 }
@@ -30,6 +31,15 @@ class ProductService: ProductServiceProtocol {
         } catch {
             return []
         }
+    }
+    
+    func fetchProduct(with id: Int) -> ProductDetailPresentationModel? {
+        let predicate = #Predicate<ProductDetailPresentationModel> { product in product.id == id }
+        let descriptor = FetchDescriptor(predicate: predicate)
+        
+        let result = try? modelContext.fetch(descriptor)
+        return result?.first
+        
     }
     
     func save(products: [ProductDetailPresentationModel]) {

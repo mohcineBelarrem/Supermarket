@@ -10,5 +10,5 @@ import Foundation
 struct CategoryPresentationModel: Identifiable {
     let id: UUID
     let name: String
-    let products: [ProductPresentationModel]
+    let products: [ProductDetailPresentationModel]
 }

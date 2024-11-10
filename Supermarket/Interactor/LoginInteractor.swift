@@ -46,7 +46,6 @@ class LoginInteractor: LoginInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: UserCreationResponse.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
     

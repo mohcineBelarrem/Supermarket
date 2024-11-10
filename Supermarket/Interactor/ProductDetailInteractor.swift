@@ -33,7 +33,6 @@ class ProductDetailInteractor: ProductDetailInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: url)
             .map { $0.data }
             .decode(type: ProductDetail.self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 }

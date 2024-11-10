@@ -37,6 +37,7 @@ class ProductDetailPresenter: ProductDetailPresenterProtocol {
     
     func loadProductDetail(for productId: Int) {
         interactor.getProductDetail(for: productId)
+            .receive(on: DispatchQueue.main)
             .map {  ProductDetailPresentationModel(id: $0.id,
                                                    name: $0.name,
                                                    category: $0.category,

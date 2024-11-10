@@ -26,16 +26,20 @@ class ProductListPresenter: ObservableObject {
     
     func viewDidLoad() {
         interactor.fetchProducts()
+            .flatMap { (products: [Product]) in
+                Publishers.MergeMany(products.map { [weak self] (product : Product) in
+                    guard let self else { return Empty<ProductDetail, Error>().eraseToAnyPublisher() }
+                    return self.interactor.fetchProductDetail(for: product.id)
+                })
+            }
+            .collect()
             .receive(on: DispatchQueue.main)
-            .map { (products : [Product]) in
+            .map { (products : [ProductDetail]) in
                 let categories = Dictionary(grouping: products, by: {$0.category})
-                return categories.map { (category: String, products: [Product]) in
+                return categories.map { (category: String, products: [ProductDetail]) in
                     CategoryPresentationModel(id: UUID(),
                                               name: category,
-                                              products: products.map { ProductPresentationModel(id: $0.id,
-                                                                                                name: $0.name,
-                                                                                                category: $0.category,
-                                                                                                inStock: $0.inStock)}
+                                              products: products.map { ProductDetailPresentationModel(product: $0) }
                     )
                 }
             }
@@ -52,11 +56,11 @@ class ProductListPresenter: ObservableObject {
             .store(in: &cancellables)
     }
     
-    func detailView(for product: ProductPresentationModel, modelContext: ModelContext) -> AnyView {
-        router.routeToDetailView(for: product, modelContext: modelContext)
+    func detailView(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToDetailView(for: product.id, modelContext: modelContext)
     }
     
-    func productView(for product: ProductPresentationModel) -> AnyView {
+    func productView(for product: ProductDetailPresentationModel) -> AnyView {
         router.routeToProductView(for: product)
     }
 }

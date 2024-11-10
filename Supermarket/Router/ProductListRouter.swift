@@ -10,25 +10,29 @@ import SwiftData
 
 
 protocol ProductListRouterProtocol {
-    static func createModule() -> AnyView
-    func routeToDetailView(for product: ProductPresentationModel, modelContext: ModelContext) -> AnyView
-    func routeToProductView(for product: ProductPresentationModel) -> AnyView
+    static func createModule(with modelContext: ModelContext) -> AnyView
+    func routeToDetailView(for productId: Int, modelContext: ModelContext) -> AnyView
+    func routeToProductView(for product: ProductDetailPresentationModel) -> AnyView
 }
 
 class ProductListRouter: ProductListRouterProtocol {
-    static func createModule() -> AnyView {
-        let interactor = ProductListInteractor()
+    static func createModule(with modelContext: ModelContext) -> AnyView {
+        
+        let service = UserProfileService(modelContext: modelContext)
+        let loginInteractor = LoginInteractor(service: service)
+        let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor)
+        let interactor = ProductListInteractor(productDetailInteractor: productDetailInteractor)
         let router = ProductListRouter()
         let presenter = ProductListPresenter(interactor: interactor, router: router)
         
         return AnyView(ProductListView(presenter: presenter))
     }
     
-    func routeToDetailView(for product: ProductPresentationModel, modelContext: ModelContext) -> AnyView {
-        ProductDetailRouter.createModule(with: product.id, modelContext: modelContext)
+    func routeToDetailView(for productId: Int, modelContext: ModelContext) -> AnyView {
+        ProductDetailRouter.createModule(with: productId, modelContext: modelContext)
     }
     
-    func routeToProductView(for product: ProductPresentationModel) -> AnyView {
+    func routeToProductView(for product: ProductDetailPresentationModel) -> AnyView {
         AnyView(ProductView(product: product))
     }
 }

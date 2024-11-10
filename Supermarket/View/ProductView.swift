@@ -8,17 +8,18 @@
 import SwiftUI
 
 struct ProductView: View {
-    var product: ProductPresentationModel
+    var product: ProductDetailPresentationModel
     var body: some View {
         VStack(alignment: .leading) {
             Text(product.name)
                 .font(.headline)
             Text(product.inStock.availability)
                 .foregroundColor(product.inStock ? .green : .red)
+            Text(product.price.formattedPrice)
         }
     }
 }
 
 #Preview {
-    ProductView(product: ProductPresentationModel.dummyProduct)
+    ProductView(product: ProductDetailPresentationModel.dummyProduct)
 }

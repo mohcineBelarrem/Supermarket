@@ -14,7 +14,7 @@ struct MainView: View {
     
     var body: some View {
         TabView(selection: $tabController.selectedTab) {
-            ProductListRouter.createModule()
+            ProductListRouter.createModule(with: modelContext)
                 .tabItem {
                     Label("Products", systemImage: "list.bullet")
                 }

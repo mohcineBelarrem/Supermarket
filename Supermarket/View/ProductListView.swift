@@ -45,5 +45,6 @@ struct ProductListView: View {
 }
 
 #Preview {
-    ProductListRouter.createModule()
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    ProductListRouter.createModule(with: mockModelContainer.mainContext)
 }

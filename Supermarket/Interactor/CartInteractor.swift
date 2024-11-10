@@ -18,7 +18,7 @@ protocol CartInteractorProtocol {
     //func addItemToCart(with itemId: Int, productId: Int, quantity: Int)
     
     
-    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
+    func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func editItemInCart(itemId: Int, with quantity: Int) -> AnyPublisher<Bool, Error>
     func deleteItemFromCart(with itemCartId: Int) -> AnyPublisher<Bool, Error>
 }
@@ -59,7 +59,7 @@ class CartInteractor: CartInteractorProtocol {
 //        }
 //    }
     
-    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {
+    func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {
         guard let user = loginInteractor.retrieveStoredCredentials() else { return
             Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
         }
@@ -78,7 +78,7 @@ class CartInteractor: CartInteractorProtocol {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let addedProduct: AddToCartBody = .init(productId: product.id, quantity: quantity)
+        let addedProduct: AddToCartBody = .init(productId: productId, quantity: quantity)
         request.httpBody = try? JSONEncoder().encode(addedProduct)
         
         return URLSession.shared.dataTaskPublisher(for: request)

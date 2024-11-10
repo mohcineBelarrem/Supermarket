@@ -129,7 +129,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     
     private func addProdtuctToCart(_ product: ProductDetailPresentationModel) {
         isLoading = true
-        interactor.addProductToCart(product.product, with: quantity)
+        interactor.addProductToCart(with: product.id, and: quantity)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }

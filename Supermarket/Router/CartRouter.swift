@@ -34,7 +34,8 @@ class CartRouter: CartRouterProtocol {
     static func createModule(with tabController: TabController, modelContext: ModelContext) -> AnyView {
         let service = UserProfileService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: service)
-        let productListInteractor = ProductListInteractor()
+        let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor)
+        let productListInteractor = ProductListInteractor(productDetailInteractor: productDetailInteractor)
         let cartInteractor = CartInteractor(loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let router = CartRouter(tabController: tabController)
         let presenter = CartPresenter(interactor: cartInteractor, router: router)

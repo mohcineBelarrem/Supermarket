@@ -18,9 +18,10 @@ class AddToCartViewRouter: AddToCartViewRouterProtocol {
         let service = UserProfileService(modelContext: modelContext)
         let productService = ProductService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: service)
+        let cartService = CartService(modelContext: modelContext)
         let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor, productService: productService)
         let productListInteractor = ProductListInteractor(productDetailInteractor: productDetailInteractor, service: productService)
-        let interactor = CartInteractor(loginInteractor: loginInteractor, productListInteractor: productListInteractor)
+        let interactor = CartInteractor(service: cartService, loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let router = AddToCartViewRouter()
         let presenter = AddToCartViewPresenter(interactor: interactor, router: router)
 

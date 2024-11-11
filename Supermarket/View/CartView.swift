@@ -16,7 +16,7 @@ struct CartView: View {
         VStack {
             if presenter.isUserLoggedIn {
                 if let cart = presenter.cart {
-                    if cart.isEmpty {
+                    if presenter.cart {
                         Text("Your cart is empty.")
                         Button {
                             presenter.goToProductList()
@@ -29,11 +29,13 @@ struct CartView: View {
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
                     } else {
-                        List(cart.items) { item in
+                        ForEach(presenter.cartItems) { (item: CartItemPresentationModel) in
                             HStack {
                                 Text("\(item.quantity)")
                                 Spacer()
-                                Text(item.label)
+                                Text("\(item.productId)")
+                                Spacer()
+                                Text(item.product.name)
                                 Spacer()
                                 Button {
                                     presenter.deleteCartItem(with: item.id)

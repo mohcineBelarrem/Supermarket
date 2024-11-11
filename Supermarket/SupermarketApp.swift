@@ -14,6 +14,6 @@ struct SupermarketApp: App {
         WindowGroup {
             APIStatusRouter.createModule()
         }
-        .modelContainer(for: [UserPresentationModel.self, ProductDetailPresentationModel.self])
+        .modelContainer(for: [UserPresentationModel.self, ProductDetailPresentationModel.self, CartPresentationModel.self])
     }
 }

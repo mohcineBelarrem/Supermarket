@@ -43,7 +43,11 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     var buttonText: String {
         if let buttonQuantity {
             if initialQuantity > 0 {
-                return initialQuantity == quantity ? "\(buttonQuantity)" : "Update Cart (\(quantity))"
+                switch quantity {
+                case 0: return "Remove from Cart"
+                case initialQuantity: return "\(buttonQuantity)"
+                default: return "Update Cart (\(quantity))"
+                }
             } else {
                 return "\(buttonQuantity)"
             }
@@ -59,7 +63,11 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     
     func buttonPressed(for product: ProductDetailPresentationModel) {
         if initialQuantity > 0 {
-            editProductQuantity(product: product, with: quantity)
+            if quantity > 0 {
+                editProductQuantity(product: product, with: quantity)
+            } else {
+                removeProductFromCart(product)
+            }
         } else {
             addProdtuctToCart(product)
         }
@@ -87,7 +95,8 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     }
     
     func quantityRange(for product: ProductDetailPresentationModel) -> ClosedRange<Int> {
-        return 1...product.currentStock
+        let lowerBound = cart?.contains(productId: product.id) ?? false ? 0 : 1
+        return lowerBound...product.currentStock
     }
     
     func totalFormattedPrice(for product: ProductDetailPresentationModel) -> String {
@@ -96,17 +105,9 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     }
     
     private func editProductQuantity(product: ProductDetailPresentationModel, with newQuantity: Int) {
+        guard let cart = cart, let item = cart.items.filter({ $0.productId == product.id }).first else { return }
         isLoading = true
-        
-        interactor.fetchCart()
-            .tryMap { cart -> Int? in
-                return cart?.items.filter { $0.productId == product.id }.first?.id
-            }
-            .compactMap { $0 }
-            .flatMap{ [weak self] (cartItemId: Int) -> AnyPublisher<Bool, Error> in
-                guard let self else { return Fail(error: CartError.cartNotFound).eraseToAnyPublisher() }
-                return interactor.editItemInCart(itemId: cartItemId, with: quantity)
-            }
+        interactor.editItemInCart(itemId: item.id, with: newQuantity)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }
@@ -123,6 +124,31 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                     self.quantity = newQuantity
                     self.buttonQuantity = newQuantity
                     interactor.saveProduct(with: product.id, with: newQuantity)
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func removeProductFromCart(_ product: ProductDetailPresentationModel) {
+        guard let cart = cart, let item = cart.items.filter({ $0.productId == product.id }).first else { return }
+        isLoading = true
+        interactor.deleteItemFromCart(with: item.id)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                guard let self else { return }
+                self.isLoading = false
+                if case .failure(let error) = completion {
+                    self.errorMessage = "Editing product quantity failed: \(error.localizedDescription)"
+                    self.buttonQuantity = nil
+                    
+                }
+            } receiveValue: { [weak self] success in
+                guard let self else { return }
+                if success {
+                    self.initialQuantity = 0
+                    self.quantity = 0
+                    self.buttonQuantity = 0
+                    interactor.removeProductFromCart(with: product.id)
                 }
             }
             .store(in: &cancellables)

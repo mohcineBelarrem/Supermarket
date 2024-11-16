@@ -17,6 +17,10 @@ class CartPresentationModel {
         self.cartId = cartId
         self.items = items
     }
+    
+    func contains(productId: Int) -> Bool {
+        return items.contains(where: { $0.productId == productId })
+    }
 }
 
 @Model

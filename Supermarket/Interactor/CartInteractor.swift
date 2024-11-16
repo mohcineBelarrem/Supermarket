@@ -18,6 +18,7 @@ protocol CartInteractorProtocol {
     func saveCart(_ cart: CartPresentationModel)
     func saveItemToCart(cartItem: CartItemPresentationModel)
     func saveProduct(with productId: Int, with newQuantity: Int)
+    func removeProductFromCart(with productId: Int)
     
     //Networking
     func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
@@ -206,5 +207,9 @@ class CartInteractor: CartInteractorProtocol {
     
     func saveProduct(with productId: Int, with newQuantity: Int) {
         service.editItem(with: productId, with: newQuantity)
+    }
+    
+    func removeProductFromCart(with productId: Int) {
+        service.removeProduct(with: productId)
     }
 }

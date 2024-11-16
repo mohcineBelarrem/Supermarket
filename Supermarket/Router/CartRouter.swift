@@ -10,28 +10,28 @@ import SwiftData
 
 
 protocol CartRouterProtocol {
-    static func createModule(with tabController: TabController, modelContext: ModelContext) -> AnyView
+    static func createModule(with mainPresenter: MainPresenter, modelContext: ModelContext) -> AnyView
     func goToLogin()
     func goToProductList()
 }
 
 
 class CartRouter: CartRouterProtocol {
-    private let tabController: TabController
+    private let mainPresenter: MainPresenter
     
-    init(tabController: TabController) {
-        self.tabController = tabController
+    init(mainPresenter: MainPresenter) {
+        self.mainPresenter = mainPresenter
     }
     
     func goToLogin() {
-        tabController.switchToLoginTab()
+        mainPresenter.switchToLoginTab()
     }
     
     func goToProductList() {
-        tabController.switchToProductListTab()
+        mainPresenter.switchToProductListTab()
     }
     
-    static func createModule(with tabController: TabController, modelContext: ModelContext) -> AnyView {
+    static func createModule(with mainPresenter: MainPresenter, modelContext: ModelContext) -> AnyView {
         let userProfileService = UserProfileService(modelContext: modelContext)
         let productService = ProductService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: userProfileService)
@@ -39,7 +39,7 @@ class CartRouter: CartRouterProtocol {
         let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor, productService: productService)
         let productListInteractor = ProductListInteractor(productDetailInteractor: productDetailInteractor, service: productService)
         let cartInteractor = CartInteractor(service: service, loginInteractor: loginInteractor, productListInteractor: productListInteractor)
-        let router = CartRouter(tabController: tabController)
+        let router = CartRouter(mainPresenter: mainPresenter)
         let presenter = CartPresenter(interactor: cartInteractor, router: router)
         
         

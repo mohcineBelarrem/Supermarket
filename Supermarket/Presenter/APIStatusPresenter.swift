@@ -7,6 +7,7 @@
 
 import Combine
 import SwiftUI
+import SwiftData
 
 class APIStatusPresenter: ObservableObject {
     private let interactor: APIStatusInteractorProtocol
@@ -16,10 +17,7 @@ class APIStatusPresenter: ObservableObject {
     @Published var errorMessage: String?
     @Published var shouldNavigateToMainView: Bool = false
 
-    var mainView: AnyView {
-        router.navigateToMainView()
-    }
-    
+   
     init(interactor: APIStatusInteractorProtocol, router: APIStatusRouterProtocol) {
         self.interactor = interactor
         self.router = router
@@ -36,5 +34,9 @@ class APIStatusPresenter: ObservableObject {
                 self.shouldNavigateToMainView = isHealthy
             })
             .store(in: &cancellables)
+    }
+    
+    func navigateToMainView(modelContext: ModelContext) -> AnyView {
+        router.navigateToMainView(with: modelContext)
     }
 }

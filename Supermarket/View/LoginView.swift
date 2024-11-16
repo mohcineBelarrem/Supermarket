@@ -31,6 +31,7 @@ struct LoginView: View {
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
                 })
+                Spacer()
             } else {
                 
                 if presenter.isLoading {

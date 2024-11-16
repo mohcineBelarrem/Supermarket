@@ -16,7 +16,7 @@ struct CartView: View {
         VStack {
             if presenter.isUserLoggedIn {
                 if let cart = presenter.cart {
-                    if presenter.cart {
+                    if cart.items.isEmpty {
                         Text("Your cart is empty.")
                         Button {
                             presenter.goToProductList()
@@ -79,8 +79,8 @@ struct CartView: View {
     }
 }
 
-#Preview {
-    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
-    CartRouter.createModule(with: TabController(),
-                            modelContext: mockModelContainer.mainContext)
-}
+//#Preview {
+//    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+//    CartRouter.createModule(with: TabController(),
+//                            modelContext: mockModelContainer.mainContext)
+//}

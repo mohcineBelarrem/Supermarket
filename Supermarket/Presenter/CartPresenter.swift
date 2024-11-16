@@ -10,7 +10,7 @@ import SwiftUI
 import Combine
 
 protocol CartPresenterProtocol: ObservableObject {
-    
+    var cart: CartPresentationModel? { get }
     var cartItems: [CartItemPresentationModel] { get }
     
     var errorMessage: String? { get }

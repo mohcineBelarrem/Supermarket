@@ -9,7 +9,8 @@ import SwiftUI
 
 struct APIStatusView: View {
     @StateObject var presenter: APIStatusPresenter
-
+    @Environment(\.modelContext) private var modelContext
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -29,7 +30,7 @@ struct APIStatusView: View {
                 }
             }
             .navigationDestination(isPresented: $presenter.shouldNavigateToMainView) {
-                presenter.mainView
+                presenter.navigateToMainView(modelContext: modelContext)
             }
         }
     }

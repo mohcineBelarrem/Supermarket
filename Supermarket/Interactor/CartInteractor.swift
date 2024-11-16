@@ -13,6 +13,7 @@ protocol CartInteractorProtocol {
     func retrieveProducts() -> [ProductDetailPresentationModel]
     func fetchCart() -> AnyPublisher<Cart?, Error>
     func createCart() -> AnyPublisher<Cart?, Error>
+    func retrieveCart() -> CartPresentationModel?
     func saveCart(_ cart: CartPresentationModel)
     func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func editItemInCart(itemId: Int, with quantity: Int) -> AnyPublisher<Bool, Error>
@@ -36,6 +37,10 @@ class CartInteractor: CartInteractorProtocol {
     
     func retrieveProducts() -> [ProductDetailPresentationModel] {
         productListInteractor.retrieveProducts()
+    }
+    
+    func retrieveCart() -> CartPresentationModel? {
+        service.fetchCart()
     }
     
     func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {

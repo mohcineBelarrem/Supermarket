@@ -21,7 +21,7 @@ struct LoginView: View {
                 presenter.profileView(for: user)
                 
                 Button(action: {
-                    presenter.logout()
+                    presenter.showAlert.toggle()
                 }, label: {
                     Text("Logout")
                         .padding()
@@ -31,7 +31,6 @@ struct LoginView: View {
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
                 })
-                Spacer()
             } else {
                 
                 if presenter.isLoading {
@@ -57,6 +56,13 @@ struct LoginView: View {
                 }
             }
         }
+        .alert("Logout", isPresented: $presenter.showAlert, actions: {
+            Button("Ok", role: .none) { presenter.logout() }
+            Button("Cancel", role: .cancel) { }
+            
+        }, message: {
+            Text("Are you sure you want to log out?")
+        })
         .padding()
     }
 }

@@ -12,6 +12,8 @@ protocol LoginPresenterProtocol: ObservableObject {
     var user: UserPresentationModel? { get }
     var errorMessage: String? { get }
     func login(username: String, email: String)
+    
+    
     func profileView(for user: UserPresentationModel) -> AnyView
     func logout()
 }
@@ -24,6 +26,8 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
     @Published var user: UserPresentationModel?
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
+    
+    @Published var showAlert: Bool = false
     
    init(interactor: LoginInteractorProtocol, router: LoginRouterProtocol) {
         self.interactor = interactor

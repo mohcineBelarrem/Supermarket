@@ -15,6 +15,7 @@ protocol CartServiceProtocol {
     func deleteCart()
 
     func saveItemToCart(cartItem: CartItemPresentationModel)
+    func editItem(with productId: Int, with newQuantity: Int)
     
     var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> { get }
 }
@@ -55,7 +56,21 @@ class CartService: CartServiceProtocol {
     
     func saveItemToCart(cartItem: CartItemPresentationModel) {
         guard let cart = fetchCart() else { return }
-        cart.items.append(cartItem)
+        let filteredItems = cart.items.filter { $0.productId != cartItem.productId }
+        cart.items = filteredItems + [cartItem]
+        do {
+            try modelContext.save()
+        } catch {
+            print("Couldn't save cart")
+        }
+    }
+    
+    func editItem(with productId: Int, with newQuantity: Int) {
+        guard let cart = fetchCart() else { return }
+        
+        guard let itemToEdit = cart.items.filter ({ $0.productId == productId }).first else { return }
+        itemToEdit.quantity = newQuantity
+    
         do {
             try modelContext.save()
         } catch {

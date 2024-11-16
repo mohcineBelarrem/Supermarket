@@ -32,6 +32,10 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     
     private var initialQuantity: Int = 0
     
+    private var cart: CartPresentationModel? {
+        interactor.retrieveCart()
+    }
+    
     var isButtonEnabbled: Bool {
         initialQuantity != quantity
     }
@@ -63,26 +67,22 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     
     
     func viewDidLoad(with product: ProductDetailPresentationModel) {
-        isLoading = true
-        interactor.fetchCart()
+        if let quantity = cart?.items.filter ({ $0.productId == product.id }).first?.quantity {
+            self.quantity = quantity
+            self.initialQuantity = quantity
+            self.buttonQuantity = quantity
+        }
+        
+        interactor.notificationPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
+            .sink(receiveValue: { [weak self] _ in
                 guard let self else { return }
-                self.isLoading = false
-                if case .failure(let error) = completion {
-                    self.errorMessage = "Adding product to Cart failed: \(error.localizedDescription)"
-                }
-            } receiveValue: { [weak self] cart in
-                guard let self = self else { return }
-                self.isLoading = false
-                
-                if let quantity = cart?.items.filter({ $0.productId == product.id }).first?.quantity  {
-                    self.initialQuantity = quantity
+                if let quantity = cart?.items.filter ({ $0.productId == product.id }).first?.quantity {
                     self.quantity = quantity
+                    self.initialQuantity = quantity
                     self.buttonQuantity = quantity
                 }
-                
-            }
+            })
             .store(in: &cancellables)
     }
     
@@ -122,6 +122,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                     self.initialQuantity = newQuantity
                     self.quantity = newQuantity
                     self.buttonQuantity = newQuantity
+                    interactor.saveProduct(with: product.id, with: newQuantity)
                 }
             }
             .store(in: &cancellables)

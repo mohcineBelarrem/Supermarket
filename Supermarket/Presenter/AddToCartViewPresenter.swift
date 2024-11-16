@@ -143,9 +143,25 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                 if response.created {
                     self.buttonQuantity = quantity
                     self.initialQuantity = quantity
+                    self.saveProductToCart(productId: product.id, itemId: response.itemId, quantity: quantity)
                 }
             }
             .store(in: &cancellables)
     }
     
+}
+
+//TODO: Make this the interactor's job
+extension AddToCartViewPresenter {
+    private func saveProductToCart(productId: Int,itemId: Int, quantity: Int) {
+        let productList = interactor.retrieveProducts()
+        
+        guard productList.count > 0 else { return }
+        
+        guard let product = productList.filter ({ $0.id  == productId }).first else { return }
+        
+        let cartItem = CartItemPresentationModel(id: itemId, productId: productId, quantity: quantity, product: product)
+        
+        interactor.saveItemToCart(cartItem: cartItem)
+    }
 }

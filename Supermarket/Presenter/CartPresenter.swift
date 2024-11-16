@@ -105,6 +105,7 @@ class CartPresenter: CartPresenterProtocol {
 }
 
 
+//TODO: Make this the interactor's job
 extension CartPresenter {
     private func transform(_ cart: Cart) -> CartPresentationModel? {
         let productList = interactor.retrieveProducts()

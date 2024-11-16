@@ -10,12 +10,18 @@ import Combine
 
 protocol CartInteractorProtocol {
     var isUserLoggedIn: Bool { get }
+    
+    //Database
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> { get }
     func retrieveProducts() -> [ProductDetailPresentationModel]
-    func fetchCart() -> AnyPublisher<Cart?, Error>
-    func createCart() -> AnyPublisher<Cart?, Error>
     func retrieveCart() -> CartPresentationModel?
     func saveCart(_ cart: CartPresentationModel)
+    func saveItemToCart(cartItem: CartItemPresentationModel)
+    
+    //Networking
     func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
+    func fetchCart() -> AnyPublisher<Cart?, Error>
+    func createCart() -> AnyPublisher<Cart?, Error>
     func editItemInCart(itemId: Int, with quantity: Int) -> AnyPublisher<Bool, Error>
     func deleteItemFromCart(with itemCartId: Int) -> AnyPublisher<Bool, Error>
 }
@@ -27,6 +33,10 @@ class CartInteractor: CartInteractorProtocol {
     
     var isUserLoggedIn: Bool {
         loginInteractor.isUserLoggedIn
+    }
+    
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> {
+        service.notificationPublisher
     }
     
     init(service: CartServiceProtocol, loginInteractor: LoginInteractorProtocol, productListInteractor: ProductListInteractorProtocol) {
@@ -187,5 +197,9 @@ class CartInteractor: CartInteractorProtocol {
 
     func saveCart(_ cart: CartPresentationModel) {
         service.saveCart(cart)
+    }
+    
+    func saveItemToCart(cartItem: CartItemPresentationModel) {
+        service.saveItemToCart(cartItem: cartItem)
     }
 }

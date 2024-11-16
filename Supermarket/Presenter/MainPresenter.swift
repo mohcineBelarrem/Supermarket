@@ -53,18 +53,11 @@ class MainPresenter: MainPresenterProtocol {
     
     func viewDidLoad() {
         self.numberOfProducts = interactor.retrieveCart()?.items.reduce(0) { $0 + $1.quantity }
+        interactor.notificationPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] _ in
+                self?.numberOfProducts = self?.interactor.retrieveCart()?.items.reduce(0) { $0 + $1.quantity }
+            })
+            .store(in: &cancellables)
     }
-
-//    func checkAPIStatus() {
-//        interactor.checkAPIStatus()
-//            .receive(on: DispatchQueue.main)
-//            .sink(receiveCompletion: { completion in
-//                if case .failure(let error) = completion {
-//                    self.errorMessage = error.localizedDescription
-//                }
-//            }, receiveValue: { isHealthy in
-//                self.shouldNavigateToMainView = isHealthy
-//            })
-//            .store(in: &cancellables)
-//    }
 }

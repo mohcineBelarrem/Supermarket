@@ -22,9 +22,8 @@ class CartButtonRouter: CartButtonRouterProtocol {
         let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor, productService: productService)
         let productListInteractor = ProductListInteractor(productDetailInteractor: productDetailInteractor, service: productService)
         let cartInteractor = CartInteractor(service: service, loginInteractor: loginInteractor, productListInteractor: productListInteractor)
-        let interactor = CartButtonInteractor(cartInteractor: cartInteractor)
         let router = CartButtonRouter()
-        let presenter = CartButtonPresenter(interactor: interactor, router: router)
+        let presenter = CartButtonPresenter(interactor: cartInteractor, router: router)
 
         return AnyView(CartButton(presenter: presenter, product: product))
     }

@@ -37,11 +37,7 @@ struct CartView: View {
                                 Spacer()
                                 Text(item.product.name)
                                 Spacer()
-                                Button {
-                                    presenter.deleteCartItem(with: item.id)
-                                } label: {
-                                    Image(systemName: "trash")
-                                }
+                                CartButtonRouter.createModule(with: item.product, modelContext: modelContext)
                             }
                         }
                     }
@@ -74,7 +70,7 @@ struct CartView: View {
         })
         .padding()
         .onAppear {
-            presenter.loadCart()
+            presenter.viewDidLoad()
         }
     }
 }

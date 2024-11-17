@@ -15,10 +15,9 @@ protocol CartPresenterProtocol: ObservableObject {
     
     var errorMessage: String? { get }
     var isUserLoggedIn: Bool { get }
-    func loadCart()
+    func viewDidLoad()
     func goToLogin()
     func goToProductList()
-    func deleteCartItem(with cartItemId: Int)
 }
 
 class CartPresenter: CartPresenterProtocol {
@@ -42,8 +41,23 @@ class CartPresenter: CartPresenterProtocol {
         self.interactor = interactor
         self.router = router
     }
-
-    func loadCart() {
+    
+    func viewDidLoad() {
+        loadCart()
+        subscribeToCartChanges()
+    }
+    
+    private func subscribeToCartChanges() {
+        interactor.notificationPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] _ in
+                guard let self else { return }
+                self.loadCart()
+            })
+            .store(in: &cancellables)
+    }
+    
+    private func loadCart() {
         interactor.fetchCart()
             .flatMap { [weak self] cart -> AnyPublisher<Cart?, Error> in
                 guard let self else { return Fail(error: URLError(.badServerResponse)).eraseToAnyPublisher() }
@@ -66,30 +80,6 @@ class CartPresenter: CartPresenterProtocol {
                 if let rawCart = rawCart, let cart = self.transform(rawCart) {
                     self.cart = cart
                     self.cartItems = cart.items
-                    self.interactor.saveCart(cart)
-                }
-            })
-            .store(in: &cancellables)
-    }
-    
-    func deleteCartItem(with cartItemId: Int) {
-        self.alertMessage = ""
-        self.showAlert = false
-        interactor.deleteItemFromCart(with: cartItemId)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                guard let self else { return }
-                if case .failure(let error) = completion {
-                    self.alertMessage = "error deleting product \(error.localizedDescription)"
-                    self.showAlert = true
-                }
-            }, receiveValue: { [weak self] success in
-                guard let self else { return }
-                if success {
-                    self.loadCart()
-                } else {
-                    self.alertMessage = "Oops there was an error deleting the product"
-                    self.showAlert = true
                 }
             })
             .store(in: &cancellables)

@@ -29,17 +29,25 @@ struct CartView: View {
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
                     } else {
-                        ForEach(presenter.cartItems) { (item: CartItemPresentationModel) in
+                        List(presenter.cartItems) { (item: CartItemPresentationModel) in
                             HStack {
-                                Text("\(item.quantity)")
-                                Spacer()
-                                Text("\(item.productId)")
-                                Spacer()
                                 Text(item.product.name)
+                                    .font(.system(size: 14, weight: .semibold))
                                 Spacer()
+                                VStack(alignment: .trailing) {
+                                    Text(item.totalFormattedPrice)
+                                        .foregroundStyle(Color.darkGreen)
+                                        .font(.system(size: 14, weight: .semibold))
+                                    Text(item.detailledPrice)
+                                        .font(.system(size: 14))
+                                }
                                 CartButtonRouter.createModule(with: item.product, modelContext: modelContext)
                             }
                         }
+                        if let totalFormattedPrice = presenter.totalFormattedPrice {
+                            Text("Total: \(totalFormattedPrice)")
+                        }
+                        
                     }
                 } else if let errorMessage = presenter.errorMessage {
                     Text(errorMessage)
@@ -80,3 +88,9 @@ struct CartView: View {
 //    CartRouter.createModule(with: TabController(),
 //                            modelContext: mockModelContainer.mainContext)
 //}
+
+extension Color {
+    static var darkGreen: Color {
+        .init(red: 0, green: 85.0/255, blue: 20.0/255)
+    }
+}

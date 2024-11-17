@@ -36,4 +36,14 @@ class CartItemPresentationModel: Identifiable {
         self.quantity = quantity
         self.product = product
     }
+    
+    var totalFormattedPrice: String {
+        let price = Double(quantity) * product.price
+        return price.formattedPrice
+    }
+    
+    var detailledPrice: String {
+        return "(\(quantity) x \(product.price.formattedPrice))"
+    }
+    
 }

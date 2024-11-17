@@ -33,6 +33,11 @@ class CartPresenter: CartPresenterProtocol {
     
     @Published var cartItems: [CartItemPresentationModel] = []
     
+    var totalFormattedPrice: String? {
+         let totalPrice = interactor.retrieveCart()?.items.reduce( 0.0) { $0 + Double($1.quantity) * $1.product.price }
+        return totalPrice?.formattedPrice
+    }
+    
     var isUserLoggedIn: Bool {
         interactor.isUserLoggedIn
     }

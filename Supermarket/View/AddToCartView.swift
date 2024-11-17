@@ -77,7 +77,7 @@ struct AddToCartView: View {
 }
 
 #Preview {
-    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
-    AddToCartViewRouter.createModule(with: ProductDetailPresentationModel.dummyProduct,
-                                     modelContext: mockModelContainer.mainContext)
+//    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+//    AddToCartViewRouter.createModule(with: ProductDetailPresentationModel.dummyProduct,
+//                                     modelContext: mockModelContainer.mainContext)
 }

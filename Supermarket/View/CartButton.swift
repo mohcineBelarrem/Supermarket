@@ -36,6 +36,7 @@ struct CartButton: View {
             .cornerRadius(8)
             .sheet(isPresented: $presenter.isShowingAddToCartView) {
                 AddToCartViewRouter.createModule(with: product,
+                                                 cartButtonPresenter: presenter,
                                                  modelContext: modelContext)
                     .foregroundStyle(.black)
                     .presentationDetents([.medium])

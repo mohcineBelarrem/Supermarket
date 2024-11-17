@@ -10,11 +10,14 @@ import SwiftData
 
 
 protocol AddToCartViewRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView
+    static func createModule(with product: ProductDetailPresentationModel, cartButtonPresenter: CartButtonPresenter, modelContext: ModelContext) -> AnyView
 }
 
 class AddToCartViewRouter: AddToCartViewRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+    
+    static var isPresented: Bool = false
+    
+    static func createModule(with product: ProductDetailPresentationModel, cartButtonPresenter: CartButtonPresenter, modelContext: ModelContext) -> AnyView {
         let service = UserProfileService(modelContext: modelContext)
         let productService = ProductService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: service)
@@ -24,6 +27,7 @@ class AddToCartViewRouter: AddToCartViewRouterProtocol {
         let interactor = CartInteractor(service: cartService, loginInteractor: loginInteractor, productListInteractor: productListInteractor)
         let router = AddToCartViewRouter()
         let presenter = AddToCartViewPresenter(interactor: interactor, router: router)
+        presenter.cartButtonPresenter = cartButtonPresenter
 
         return AnyView(AddToCartView(presenter: presenter, product: product))
     }

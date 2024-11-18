@@ -51,7 +51,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                 switch quantity {
                 case 0: return "Remove from Cart"
                 case initialQuantity: return "\(buttonQuantity)"
-                default: return "Update Cart (\(quantity))"
+                default: return "Update Quantity: (\(quantity))"
                 }
             } else {
                 return "\(buttonQuantity)"

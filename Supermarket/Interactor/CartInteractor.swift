@@ -16,6 +16,7 @@ protocol CartInteractorProtocol {
     func retrieveProducts() -> [ProductDetailPresentationModel]
     func retrieveCart() -> CartPresentationModel?
     func saveCart(_ cart: CartPresentationModel)
+    func deleteCart()
     func saveItemToCart(cartItem: CartItemPresentationModel)
     func saveProduct(with productId: Int, with newQuantity: Int)
     func removeProductFromCart(with productId: Int)
@@ -211,5 +212,9 @@ class CartInteractor: CartInteractorProtocol {
     
     func removeProductFromCart(with productId: Int) {
         service.removeProduct(with: productId)
+    }
+    
+    func deleteCart() {
+        service.deleteCart()
     }
 }

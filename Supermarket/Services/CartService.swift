@@ -95,6 +95,13 @@ class CartService: CartServiceProtocol {
     func deleteCart() {
         if let cart = fetchCart() {
             modelContext.delete(cart)
+            
+            do {
+                try modelContext.save()
+            } catch {
+                print("Couldn't delete cart")
+            }
+            
         }
     }
 }

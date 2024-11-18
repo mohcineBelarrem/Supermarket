@@ -15,14 +15,17 @@ protocol LoginInteractorProtocol {
     func store(user: UserPresentationModel)
     func retrieveStoredCredentials() -> UserPresentationModel?
     func clearStoredCredentials()
+    func clearCart()
 }
 
 class LoginInteractor: LoginInteractorProtocol {
     
     private let service: UserProfileServiceProtocol
+    private let cartService: CartServiceProtocol
     
-    init(service: UserProfileServiceProtocol) {
+    init(service: UserProfileServiceProtocol, cartService: CartServiceProtocol) {
         self.service = service
+        self.cartService = cartService
     }
     
     var isUserLoggedIn: Bool {
@@ -61,4 +64,7 @@ class LoginInteractor: LoginInteractorProtocol {
         service.deleteUser()
     }
     
+    func clearCart() {
+        cartService.deleteCart()
+    }
 }

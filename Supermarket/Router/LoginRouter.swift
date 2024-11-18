@@ -16,7 +16,8 @@ protocol LoginRouterProtocol {
 class LoginRouter: LoginRouterProtocol {
     static func createModule(with modelContext: ModelContext) -> AnyView {
         let service = UserProfileService(modelContext: modelContext)
-        let interactor = LoginInteractor(service: service)
+        let cartService = CartService(modelContext: modelContext)
+        let interactor = LoginInteractor(service: service, cartService: cartService)
         let router = LoginRouter()
         let presenter = LoginPresenter(interactor: interactor, router: router)
         

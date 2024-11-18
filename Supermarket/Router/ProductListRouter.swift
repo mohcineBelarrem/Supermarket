@@ -20,7 +20,8 @@ class ProductListRouter: ProductListRouterProtocol {
         
         let service = UserProfileService(modelContext: modelContext)
         let productService = ProductService(modelContext: modelContext)
-        let loginInteractor = LoginInteractor(service: service)
+        let cartService = CartService(modelContext: modelContext)
+        let loginInteractor = LoginInteractor(service: service, cartService: cartService)
         let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor, productService: productService)
         let interactor = ProductListInteractor(productDetailInteractor: productDetailInteractor, service: productService)
         let router = ProductListRouter()

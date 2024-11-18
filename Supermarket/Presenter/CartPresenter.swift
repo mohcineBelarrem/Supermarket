@@ -85,6 +85,9 @@ class CartPresenter: CartPresenterProtocol {
                 if let rawCart = rawCart, let cart = self.transform(rawCart) {
                     self.cart = cart
                     self.cartItems = cart.items
+                    if self.interactor.retrieveCart() == nil {
+                        self.interactor.saveCart(cart)
+                    }
                 }
             })
             .store(in: &cancellables)

@@ -11,6 +11,7 @@ import SwiftData
 
 protocol CartRouterProtocol {
     static func createModule(with mainPresenter: MainPresenter, modelContext: ModelContext) -> AnyView
+    func routeToCartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView 
     func goToLogin()
     func goToProductList()
 }
@@ -31,6 +32,10 @@ class CartRouter: CartRouterProtocol {
         mainPresenter.switchToProductListTab()
     }
     
+    func routeToCartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        CartButtonRouter.createModule(with: product, modelContext: modelContext)
+    }
+
     static func createModule(with mainPresenter: MainPresenter, modelContext: ModelContext) -> AnyView {
         let userProfileService = UserProfileService(modelContext: modelContext)
         let productService = ProductService(modelContext: modelContext)

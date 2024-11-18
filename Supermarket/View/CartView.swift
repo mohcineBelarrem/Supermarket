@@ -41,7 +41,8 @@ struct CartView: View {
                                     Text(item.detailledPrice)
                                         .font(.system(size: 14))
                                 }
-                                CartButtonRouter.createModule(with: item.product, modelContext: modelContext)
+                                presenter.cartButton(for: item.product,
+                                                     modelContext: modelContext)
                             }
                         }
                         if let totalFormattedPrice = presenter.totalFormattedPrice {

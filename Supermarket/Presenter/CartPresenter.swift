@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 import Combine
 
 protocol CartPresenterProtocol: ObservableObject {
@@ -15,6 +16,7 @@ protocol CartPresenterProtocol: ObservableObject {
     
     var errorMessage: String? { get }
     var isUserLoggedIn: Bool { get }
+    func cartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView
     func viewDidLoad()
     func goToLogin()
     func goToProductList()
@@ -99,6 +101,10 @@ class CartPresenter: CartPresenterProtocol {
     
     func goToProductList() {
         router.goToProductList()
+    }
+    
+    func cartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToCartButton(for: product, modelContext: modelContext)
     }
 }
 

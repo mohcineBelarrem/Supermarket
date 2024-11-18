@@ -20,20 +20,30 @@ struct ProductListView: View {
             } else if presenter.productCategories.isEmpty {
                 ProgressView("Loading...")
             } else {
-                List {
+                ScrollView{
                     ForEach(presenter.productCategories) { category in
-                        Section(header: Text(category.name)) {
-                            ForEach(category.products) { product in
-                               NavigationLink {
-                                   presenter.detailView(for: product,
-                                                        modelContext: modelContext)
-                                } label: {
+                        presenter.categoryView(for: category)
+                        ForEach(category.products) { product in
+                            NavigationLink {
+                                presenter.detailView(for: product, modelContext: modelContext)
+                            } label: {
+                                HStack() {
                                     presenter.productView(for: product)
+                                    Spacer()
+                                    presenter.cartButton(for: product, modelContext: modelContext)
                                 }
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
                             }
+                            .foregroundColor(.black)
                         }
                     }
                 }
+                .padding()
+                .background(Color.background)
+                Spacer()
+                    .frame(height: 100)
             }
         }
         .task {
@@ -41,10 +51,17 @@ struct ProductListView: View {
                 presenter.viewDidLoad()
             }
         }
+        .background(Color.gray)
     }
 }
 
 #Preview {
     let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
     ProductListRouter.createModule(with: mockModelContainer.mainContext)
+}
+
+extension Color {
+    static var background: Color {
+        .init(red: 239.0/255, green: 239.0/255, blue: 244.0/255)
+    }
 }

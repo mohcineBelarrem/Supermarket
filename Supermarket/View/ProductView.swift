@@ -10,12 +10,14 @@ import SwiftUI
 struct ProductView: View {
     var product: ProductDetailPresentationModel
     var body: some View {
-        VStack(alignment: .leading) {
+        HStack() {
             Text(product.name)
-                .font(.headline)
-            Text(product.inStock.availability)
-                .foregroundColor(product.inStock ? .green : .red)
+                .font(.system(size: 14, weight: .semibold))
+                .multilineTextAlignment(.leading)
+            Spacer()
             Text(product.price.formattedPrice)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(product.inStock ? .green : .red)
         }
     }
 }

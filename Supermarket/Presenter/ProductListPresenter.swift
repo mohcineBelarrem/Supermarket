@@ -57,8 +57,16 @@ class ProductListPresenter: ObservableObject {
         router.routeToDetailView(for: product.id, modelContext: modelContext)
     }
     
+    func categoryView(for category: CategoryPresentationModel) -> AnyView {
+        router.routeToCategoryView(for: category)
+    }
+    
     func productView(for product: ProductDetailPresentationModel) -> AnyView {
         router.routeToProductView(for: product)
+    }
+    
+    func cartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToCartButton(for: product, modelContext: modelContext)
     }
     
     private func regroupProductsByCategories(products: [ProductDetailPresentationModel]) -> [CategoryPresentationModel] {

@@ -13,6 +13,8 @@ protocol ProductListRouterProtocol {
     static func createModule(with modelContext: ModelContext) -> AnyView
     func routeToDetailView(for productId: Int, modelContext: ModelContext) -> AnyView
     func routeToProductView(for product: ProductDetailPresentationModel) -> AnyView
+    func routeToCartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView
+    func routeToCategoryView(for category: CategoryPresentationModel) -> AnyView
 }
 
 class ProductListRouter: ProductListRouterProtocol {
@@ -36,5 +38,13 @@ class ProductListRouter: ProductListRouterProtocol {
     
     func routeToProductView(for product: ProductDetailPresentationModel) -> AnyView {
         AnyView(ProductView(product: product))
+    }
+    
+    func routeToCartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        CartButtonRouter.createModule(with: product, modelContext: modelContext)
+    }
+    
+    func routeToCategoryView(for category: CategoryPresentationModel) -> AnyView {
+        AnyView(CategoryView(category: category))
     }
 }

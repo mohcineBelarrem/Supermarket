@@ -29,26 +29,23 @@ struct CartView: View {
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
                     } else {
-                        List(presenter.cartItems) { (item: CartItemPresentationModel) in
-                            HStack {
-                                Text(item.product.name)
-                                    .font(.system(size: 14, weight: .semibold))
-                                Spacer()
-                                VStack(alignment: .trailing) {
-                                    Text(item.totalFormattedPrice)
-                                        .foregroundStyle(Color.darkGreen)
-                                        .font(.system(size: 14, weight: .semibold))
-                                    Text(item.detailledPrice)
-                                        .font(.system(size: 14))
+                        ScrollView {
+                            ForEach(presenter.cartItems) { (item: CartItemPresentationModel) in
+                                HStack {
+                                    presenter.cartItemView(for: item)
+                                    presenter.cartButton(for: item.product,
+                                                         modelContext: modelContext)
                                 }
-                                presenter.cartButton(for: item.product,
-                                                     modelContext: modelContext)
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
                             }
                         }
+                        .padding()
+                        Spacer()
                         if let totalFormattedPrice = presenter.totalFormattedPrice {
                             Text("Total: \(totalFormattedPrice)")
                         }
-                        
                     }
                 } else if let errorMessage = presenter.errorMessage {
                     Text(errorMessage)
@@ -78,6 +75,7 @@ struct CartView: View {
             Text(presenter.alertMessage)
         })
         .padding()
+        .background(Color.background)
         .onAppear {
             presenter.viewDidLoad()
         }

@@ -106,6 +106,10 @@ class CartPresenter: CartPresenterProtocol {
     func cartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
         router.routeToCartButton(for: product, modelContext: modelContext)
     }
+    
+    func cartItemView(for item: CartItemPresentationModel) -> AnyView {
+        router.routeToCartItemView(for: item)
+    }
 }
 
 

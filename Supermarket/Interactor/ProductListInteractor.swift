@@ -9,6 +9,8 @@ import Combine
 import Foundation
 
 protocol ProductListInteractorProtocol {
+    var isUserLoggedIn: Bool { get }
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> { get }
     func fetchProducts() -> AnyPublisher<[Product], Error>
     func fetchProductDetail(for productId: Int) -> AnyPublisher<ProductDetail, Error>
     func store(products: [ProductDetailPresentationModel])
@@ -19,6 +21,14 @@ protocol ProductListInteractorProtocol {
 class ProductListInteractor: ProductListInteractorProtocol {
     private let productDetailInteractor: ProductDetailInteractorProtocol
     private let service: ProductServiceProtocol
+    
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> {
+        service.notificationPublisher
+    }
+    
+    var isUserLoggedIn: Bool {
+        productDetailInteractor.isUserLoggedIn
+    }
     
     init(productDetailInteractor: ProductDetailInteractorProtocol, service: ProductServiceProtocol) {
         self.productDetailInteractor = productDetailInteractor

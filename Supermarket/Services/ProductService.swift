@@ -6,9 +6,12 @@
 //
 
 import Foundation
+import Combine
 import SwiftData
 
 protocol ProductServiceProtocol {
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> { get }
+    
     func fetchProducts() -> [ProductDetailPresentationModel]
     func fetchProduct(with id: Int) -> ProductDetailPresentationModel?
     func save(products: [ProductDetailPresentationModel])
@@ -17,6 +20,11 @@ protocol ProductServiceProtocol {
 
 class ProductService: ProductServiceProtocol {
     private let modelContext: ModelContext
+    
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> {
+        NotificationCenter.default.publisher(for: ModelContext.didSave)
+             .eraseToAnyPublisher()
+    }
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext

@@ -19,6 +19,10 @@ class ProductListPresenter: ObservableObject {
     @Published var productCategories: [CategoryPresentationModel] = []
     @Published var errorMessage: String?
     
+    var isUserLoggedIn: Bool {
+        interactor.isUserLoggedIn
+    }
+    
     init(interactor: ProductListInteractorProtocol, router: ProductListRouterProtocol) {
         self.interactor = interactor
         self.router = router
@@ -26,6 +30,27 @@ class ProductListPresenter: ObservableObject {
     }
     
     func viewDidLoad() {
+        loadProduct()
+        subscribeToCartChanges()
+    }
+    
+    func detailView(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToDetailView(for: product.id, modelContext: modelContext)
+    }
+    
+    func categoryView(for category: CategoryPresentationModel) -> AnyView {
+        router.routeToCategoryView(for: category)
+    }
+    
+    func productView(for product: ProductDetailPresentationModel) -> AnyView {
+        router.routeToProductView(for: product)
+    }
+    
+    func cartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToCartButton(for: product, modelContext: modelContext)
+    }
+    
+    private func loadProduct() {
         interactor.fetchProducts()
             .flatMap { (products: [Product]) in
                 Publishers.MergeMany(products.map { [weak self] (product : Product) in
@@ -47,26 +72,22 @@ class ProductListPresenter: ObservableObject {
                 }
             }, receiveValue: { [weak self] (products: [ProductDetailPresentationModel]) in
                 guard let self else { return }
-                self.interactor.store(products: products)
                 self.productCategories = self.regroupProductsByCategories(products: products)
+                if self.interactor.retrieveProducts().isEmpty {
+                    self.interactor.store(products: products)
+                }
             })
             .store(in: &cancellables)
     }
     
-    func detailView(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
-        router.routeToDetailView(for: product.id, modelContext: modelContext)
-    }
-    
-    func categoryView(for category: CategoryPresentationModel) -> AnyView {
-        router.routeToCategoryView(for: category)
-    }
-    
-    func productView(for product: ProductDetailPresentationModel) -> AnyView {
-        router.routeToProductView(for: product)
-    }
-    
-    func cartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
-        router.routeToCartButton(for: product, modelContext: modelContext)
+    private func subscribeToCartChanges() {
+        interactor.notificationPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { [weak self] _ in
+                guard let self else { return }
+                self.loadProduct()
+            })
+            .store(in: &cancellables)
     }
     
     private func regroupProductsByCategories(products: [ProductDetailPresentationModel]) -> [CategoryPresentationModel] {

@@ -30,7 +30,9 @@ struct ProductListView: View {
                                 HStack() {
                                     presenter.productView(for: product)
                                     Spacer()
-                                    presenter.cartButton(for: product, modelContext: modelContext)
+                                    if presenter.isUserLoggedIn {
+                                        presenter.cartButton(for: product, modelContext: modelContext)
+                                    }
                                 }
                                 .padding()
                                 .background(Color.white)
@@ -39,6 +41,8 @@ struct ProductListView: View {
                             .foregroundColor(.black)
                         }
                     }
+                    Spacer()
+                        .frame(height: 20)
                 }
                 .padding()
                 .background(Color.background)

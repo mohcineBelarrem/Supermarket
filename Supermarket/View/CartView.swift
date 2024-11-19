@@ -90,8 +90,3 @@ struct CartView: View {
 //                            modelContext: mockModelContainer.mainContext)
 //}
 
-extension Color {
-    static var darkGreen: Color {
-        .init(red: 0, green: 85.0/255, blue: 20.0/255)
-    }
-}

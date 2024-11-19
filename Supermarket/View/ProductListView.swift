@@ -59,9 +59,3 @@ struct ProductListView: View {
     let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
     ProductListRouter.createModule(with: mockModelContainer.mainContext)
 }
-
-extension Color {
-    static var background: Color {
-        .init(red: 239.0/255, green: 239.0/255, blue: 244.0/255)
-    }
-}

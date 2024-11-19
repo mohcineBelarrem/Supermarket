@@ -29,8 +29,8 @@ struct CartButton: View {
                 }
                 
             }
-            .frame(width: 24, height: 24)
-            .padding(10)
+            .frame(width: 20, height: 20)
+            .padding(8)
             .background(presenter.isButtonEnabled(for: product) ? .green : .gray)
             .foregroundStyle(.white)
             .cornerRadius(8)

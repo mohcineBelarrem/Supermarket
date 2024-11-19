@@ -6,10 +6,13 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CartButton: View {
     @StateObject var presenter: CartButtonPresenter
     var product: ProductDetailPresentationModel
+    @Environment(\.modelContext) private var modelContext
+    
     var body: some View {
         Button {
             presenter.isShowingAddToCartView.toggle()
@@ -26,13 +29,15 @@ struct CartButton: View {
                 }
                 
             }
-            .frame(width: 24, height: 24)
-            .padding(10)
+            .frame(width: 20, height: 20)
+            .padding(8)
             .background(presenter.isButtonEnabled(for: product) ? .green : .gray)
             .foregroundStyle(.white)
             .cornerRadius(8)
             .sheet(isPresented: $presenter.isShowingAddToCartView) {
-                AddToCartViewRouter.createModule(with: product)
+                AddToCartViewRouter.createModule(with: product,
+                                                 cartButtonPresenter: presenter,
+                                                 modelContext: modelContext)
                     .foregroundStyle(.black)
                     .presentationDetents([.medium])
             }
@@ -45,5 +50,7 @@ struct CartButton: View {
 }
 
 #Preview {
-    CartButtonRouter.createModule(with: ProductDetailPresentationModel.dummyProduct)
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    CartButtonRouter.createModule(with: ProductDetailPresentationModel.dummyProduct,
+                                  modelContext: mockModelContainer.mainContext)
 }

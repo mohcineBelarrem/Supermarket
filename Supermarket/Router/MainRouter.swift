@@ -1,20 +1,19 @@
 //
-//  CartButtonRouter.swift
+//  MainRouter.swift
 //  Supermarket
 //
-//  Created by Mohcine on 14/10/2024.
+//  Created by Mohcine on 15/11/2024.
 //
 
 import SwiftUI
 import SwiftData
 
-
-protocol CartButtonRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView
+protocol MainRouterProtocol {
+    static func createModule(with modelContext: ModelContext) -> AnyView
 }
 
-class CartButtonRouter: CartButtonRouterProtocol {
-    static func createModule(with product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+class MainRouter: MainRouterProtocol {
+    static func createModule(with modelContext: ModelContext) -> AnyView {
         let userProfileService = UserProfileService(modelContext: modelContext)
         let productService = ProductService(modelContext: modelContext)
         let service = CartService(modelContext: modelContext)
@@ -22,9 +21,8 @@ class CartButtonRouter: CartButtonRouterProtocol {
         let productDetailInteractor = ProductDetailInteractor(loginInteractor: loginInteractor, productService: productService)
         let productListInteractor = ProductListInteractor(productDetailInteractor: productDetailInteractor, service: productService)
         let cartInteractor = CartInteractor(service: service, loginInteractor: loginInteractor, productListInteractor: productListInteractor)
-        let router = CartButtonRouter()
-        let presenter = CartButtonPresenter(interactor: cartInteractor, router: router)
-
-        return AnyView(CartButton(presenter: presenter, product: product))
+        let router = MainRouter()
+        let presenter = MainPresenter(interactor: cartInteractor, router: router)
+        return AnyView(MainView(presenter: presenter))
     }
 }

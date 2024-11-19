@@ -10,61 +10,58 @@ import Combine
 
 protocol CartInteractorProtocol {
     var isUserLoggedIn: Bool { get }
+    
+    //Database
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> { get }
+    func retrieveProducts() -> [ProductDetailPresentationModel]
+    func retrieveCart() -> CartPresentationModel?
+    func saveCart(_ cart: CartPresentationModel)
+    func deleteCart()
+    func saveItemToCart(cartItem: CartItemPresentationModel)
+    func saveProduct(with productId: Int, with newQuantity: Int)
+    func removeProductFromCart(with productId: Int)
+    
+    //Networking
+    func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func fetchCart() -> AnyPublisher<Cart?, Error>
-    func fetchProducts() -> AnyPublisher<[Product], Error>
     func createCart() -> AnyPublisher<Cart?, Error>
-    func storeCartId(with cartId: String)
-    func getStoredCartId() -> String?
-    //func addItemToCart(with itemId: Int, productId: Int, quantity: Int)
-    
-    
-    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func editItemInCart(itemId: Int, with quantity: Int) -> AnyPublisher<Bool, Error>
     func deleteItemFromCart(with itemCartId: Int) -> AnyPublisher<Bool, Error>
 }
 
 class CartInteractor: CartInteractorProtocol {
-    //private var cartDefaults = UserDefaultsPublisher<CartPresentationModel>(userDefaults: .standard, key: "cart")
     private let loginInteractor: LoginInteractorProtocol
     private let productListInteractor: ProductListInteractorProtocol
-    
-    
-    @Published var cart: CartPresentationModel?
-//    private var cancellables = Set<AnyCancellable>()
+    private let service: CartServiceProtocol
     
     var isUserLoggedIn: Bool {
         loginInteractor.isUserLoggedIn
     }
     
-    init(loginInteractor: LoginInteractorProtocol, productListInteractor: ProductListInteractorProtocol) {
+    var notificationPublisher: AnyPublisher<NotificationCenter.Publisher.Output, NotificationCenter.Publisher.Failure> {
+        service.notificationPublisher
+    }
+    
+    init(service: CartServiceProtocol, loginInteractor: LoginInteractorProtocol, productListInteractor: ProductListInteractorProtocol) {
         self.loginInteractor = loginInteractor
         self.productListInteractor = productListInteractor
-        
-//        cartDefaults.publisher
-//            .sink { [weak self] cart in
-//                self?.cart = cart
-//            }
-//            .store(in: &cancellables)
+        self.service = service
     }
     
-    func fetchProducts() -> AnyPublisher<[Product], Error> {
-        productListInteractor.fetchProducts()
+    func retrieveProducts() -> [ProductDetailPresentationModel] {
+        productListInteractor.retrieveProducts()
     }
     
-//    func addItemToCart(with itemId: Int, productId: Int, quantity: Int) {
-//        if let cart = cartDefaults.getLatestValue() {
-//            let newItems = cart.items.map { CartItem(id: $0.id, productId: $0.productId, quantity: $0.quantity)} + [(.init(id: itemId, productId: productId, quantity: quantity))]
-//            let newCart = CartPresentationModel(Cart(cartId: cart.cartId, items: newItems))
-//            cartDefaults.save(newCart)
-//        }
-//    }
+    func retrieveCart() -> CartPresentationModel? {
+        service.fetchCart()
+    }
     
-    func addProductToCart(_ product: ProductPresentationModel, with quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {
+    func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {
         guard let user = loginInteractor.retrieveStoredCredentials() else { return
             Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
         }
         
-        guard let cartId = getStoredCartId() else { return
+        guard let cartId = service.fetchCart()?.cartId else { return
             Fail(error: CartError.cartNotFound).eraseToAnyPublisher()
         }
         
@@ -78,7 +75,7 @@ class CartInteractor: CartInteractorProtocol {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let addedProduct: AddToCartBody = .init(productId: product.id, quantity: quantity)
+        let addedProduct: AddToCartBody = .init(productId: productId, quantity: quantity)
         request.httpBody = try? JSONEncoder().encode(addedProduct)
         
         return URLSession.shared.dataTaskPublisher(for: request)
@@ -93,7 +90,7 @@ class CartInteractor: CartInteractorProtocol {
             Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
         }
         
-        guard let cartId = getStoredCartId() else { return
+        guard let cartId = service.fetchCart()?.cartId else { return
             Fail(error: CartError.cartNotFound).eraseToAnyPublisher()
         }
         
@@ -126,7 +123,7 @@ class CartInteractor: CartInteractorProtocol {
             Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
         }
         
-        guard let cartId = getStoredCartId() else {
+        guard let cartId = service.fetchCart()?.cartId else {
             return Future { promise in promise(.success(nil)) }
                     .eraseToAnyPublisher()
         }
@@ -141,11 +138,8 @@ class CartInteractor: CartInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: [CartItem].self, decoder: JSONDecoder())
-            .map { [weak self] (cartItems: [CartItem]) in
-                guard let self else { return .init(cartId: "", items: []) }
-                let cart = Cart(cartId: cartId, items: cartItems)
-                //self.cartDefaults.save(.init(cart))
-                return cart
+            .map { (cartItems: [CartItem]) in
+                return Cart(cartId: cartId, items: cartItems)
             }
             .eraseToAnyPublisher()
     }
@@ -168,12 +162,9 @@ class CartInteractor: CartInteractorProtocol {
         return URLSession.shared.dataTaskPublisher(for: request)
             .map { $0.data }
             .decode(type: CartCreationResponse.self, decoder: JSONDecoder())
-            .map { [weak self] cartCreationResponse in
-                guard let self = self else { return .init(cartId: "", items: []) }
+            .map { cartCreationResponse in
                 if cartCreationResponse.created {
-                    let cart = Cart(cartId: cartCreationResponse.cartId, items: [])
-                    //self.cartDefaults.save(.init(cart))
-                    return cart
+                    return Cart(cartId: cartCreationResponse.cartId, items: [])
                 }
                 return nil
             }
@@ -185,7 +176,7 @@ class CartInteractor: CartInteractorProtocol {
             Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
         }
         
-        guard let cartId = getStoredCartId() else { return
+        guard let cartId = service.fetchCart()?.cartId else { return
             Fail(error: CartError.cartNotFound).eraseToAnyPublisher()
         }
         
@@ -207,11 +198,23 @@ class CartInteractor: CartInteractorProtocol {
             .eraseToAnyPublisher()
     }
 
-    func storeCartId(with cartId: String) {
-        UserDefaults.standard.set(cartId, forKey: "cartId")
+    func saveCart(_ cart: CartPresentationModel) {
+        service.saveCart(cart)
     }
-
-    func getStoredCartId() -> String? {
-        return UserDefaults.standard.string(forKey: "cartId")
+    
+    func saveItemToCart(cartItem: CartItemPresentationModel) {
+        service.saveItemToCart(cartItem: cartItem)
+    }
+    
+    func saveProduct(with productId: Int, with newQuantity: Int) {
+        service.editItem(with: productId, with: newQuantity)
+    }
+    
+    func removeProductFromCart(with productId: Int) {
+        service.removeProduct(with: productId)
+    }
+    
+    func deleteCart() {
+        service.deleteCart()
     }
 }

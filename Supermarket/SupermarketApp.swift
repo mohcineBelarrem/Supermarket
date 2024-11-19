@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct SupermarketApp: App {
     var body: some Scene {
-           WindowGroup {
-               APIStatusRouter.createModule()
-           }
-       }
+        WindowGroup {
+            APIStatusRouter.createModule()
+        }
+        .modelContainer(for: [UserPresentationModel.self, ProductDetailPresentationModel.self, CartPresentationModel.self])
+    }
 }

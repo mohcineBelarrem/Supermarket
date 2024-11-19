@@ -6,33 +6,44 @@
 //
 
 import SwiftUI
+import SwiftData
+
+
+//TODO: Add presenter for this view
+//The presenter should fetch the number for the badge
 
 struct MainView: View {
-    @ObservedObject var tabController = TabController()
+    @StateObject var presenter: MainPresenter
+    @Environment(\.modelContext) private var modelContext
+    
     var body: some View {
-        TabView(selection: $tabController.selectedTab) {
-            ProductListRouter.createModule()
+        TabView(selection: $presenter.selectedTab) {
+            ProductListRouter.createModule(with: modelContext)
                 .tabItem {
                     Label("Products", systemImage: "list.bullet")
                 }
-                .tag(TabController.Tab.productList)
+                .tag(Tab.productList)
             
-            LoginRouter.createModule()
-                .tabItem {
-                    Label("Profile", systemImage: "person.crop.circle")
-                }
-                .tag(TabController.Tab.login)
+                LoginRouter.createModule(with: modelContext)
+                    .tabItem {
+                        Label("Profile", systemImage: "person.crop.circle")
+                    }
+                    .tag(Tab.login)
             
-            CartRouter.createModule(with: tabController)
+            CartRouter.createModule(with: presenter, modelContext: modelContext)
                 .tabItem {
                     Label("Cart", systemImage: "cart")
                 }
-                .tag(TabController.Tab.cart)
+                .tag(Tab.cart)
+                .badge(presenter.numberOfProducts ?? 0)
         }
         .navigationBarBackButtonHidden(true)
+        .task {
+            presenter.viewDidLoad()
+        }
     }
 }
 
-#Preview {
-    MainView()
-}
+//#Preview {
+//    MainView()
+//}

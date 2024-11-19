@@ -16,24 +16,21 @@ protocol CartButtonPresenterProtocol: ObservableObject {
 
 
 class CartButtonPresenter: CartButtonPresenterProtocol {
-    private let interactor: CartButtonInteractorProtocol
+    private let interactor: CartInteractorProtocol
     private let router: CartButtonRouterProtocol
     
     private var cancellables = Set<AnyCancellable>()
-    private var product: ProductDetailPresentationModel?
     
     @Published var errorMessage: String?
     @Published var productQuantityInCart: Int?
     @Published var isLoading: Bool = false
-    @Published var isShowingAddToCartView: Bool = false {
-        didSet {
-            if let product {
-                fetchQuantity(for: product)
-            }
-        }
+    @Published var isShowingAddToCartView: Bool = false
+    
+    private var cart: CartPresentationModel? {
+        interactor.retrieveCart()
     }
     
-    init(interactor: CartButtonInteractorProtocol, router: CartButtonRouterProtocol) {
+    init(interactor: CartInteractorProtocol, router: CartButtonRouterProtocol) {
         self.interactor = interactor
         self.router = router
     }
@@ -43,22 +40,13 @@ class CartButtonPresenter: CartButtonPresenterProtocol {
     }
     
     func fetchQuantity(for product: ProductDetailPresentationModel) {
-        isLoading = true
-        self.product = product
-        interactor.fetchCart()
+        self.productQuantityInCart = cart?.items.filter { $0.productId == product.id }.first?.quantity
+        interactor.notificationPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
+            .sink(receiveValue: { [weak self] _ in
                 guard let self else { return }
-                self.isLoading = false
-                if case .failure(let error) = completion {
-                    self.errorMessage = error.localizedDescription
-                }
-            } receiveValue: { [weak self] cart in
-                guard let self else { return }
-                self.isLoading = false
-                self.productQuantityInCart = cart?.items.filter { $0.productId == product.id }.first?.quantity
-            }
+                self.productQuantityInCart = self.cart?.items.filter { $0.productId == product.id }.first?.quantity
+            })
             .store(in: &cancellables)
-
     }
 }

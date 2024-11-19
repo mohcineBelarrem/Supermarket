@@ -12,6 +12,7 @@ import SwiftUI
 protocol AddToCartViewPresenterProtocol: ObservableObject {
     var quantity: Int { get set }
     var buttonQuantity: Int? { get }
+    var isPresented: Bool { get set }
     func quantityRange(for product: ProductDetailPresentationModel) -> ClosedRange<Int>
     func totalFormattedPrice(for product: ProductDetailPresentationModel) -> String
     func viewDidLoad(with product: ProductDetailPresentationModel)
@@ -30,7 +31,15 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     @Published var isLoading: Bool = false
     @Published var buttonQuantity: Int? = nil
     
+    @Published var isPresented: Bool = false
+    
     private var initialQuantity: Int = 0
+    
+    weak var cartButtonPresenter: CartButtonPresenter?
+    
+    private var cart: CartPresentationModel? {
+        interactor.retrieveCart()
+    }
     
     var isButtonEnabbled: Bool {
         initialQuantity != quantity
@@ -39,7 +48,11 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     var buttonText: String {
         if let buttonQuantity {
             if initialQuantity > 0 {
-                return initialQuantity == quantity ? "\(buttonQuantity)" : "Update Cart (\(quantity))"
+                switch quantity {
+                case 0: return "Remove from Cart"
+                case initialQuantity: return "\(buttonQuantity)"
+                default: return "Update Quantity: (\(quantity))"
+                }
             } else {
                 return "\(buttonQuantity)"
             }
@@ -55,7 +68,11 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     
     func buttonPressed(for product: ProductDetailPresentationModel) {
         if initialQuantity > 0 {
-            editProductQuantity(product: product, with: quantity)
+            if quantity > 0 {
+                editProductQuantity(product: product, with: quantity)
+            } else {
+                removeProductFromCart(product)
+            }
         } else {
             addProdtuctToCart(product)
         }
@@ -63,31 +80,28 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     
     
     func viewDidLoad(with product: ProductDetailPresentationModel) {
-        isLoading = true
-        interactor.fetchCart()
+        if let quantity = cart?.items.filter ({ $0.productId == product.id }).first?.quantity {
+            self.quantity = quantity
+            self.initialQuantity = quantity
+            self.buttonQuantity = quantity
+        }
+        
+        interactor.notificationPublisher
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] completion in
+            .sink(receiveValue: { [weak self] _ in
                 guard let self else { return }
-                self.isLoading = false
-                if case .failure(let error) = completion {
-                    self.errorMessage = "Adding product to Cart failed: \(error.localizedDescription)"
-                }
-            } receiveValue: { [weak self] cart in
-                guard let self = self else { return }
-                self.isLoading = false
-                
-                if let quantity = cart?.items.filter({ $0.productId == product.id }).first?.quantity  {
-                    self.initialQuantity = quantity
+                if let quantity = cart?.items.filter ({ $0.productId == product.id }).first?.quantity {
                     self.quantity = quantity
+                    self.initialQuantity = quantity
                     self.buttonQuantity = quantity
                 }
-                
-            }
+            })
             .store(in: &cancellables)
     }
     
     func quantityRange(for product: ProductDetailPresentationModel) -> ClosedRange<Int> {
-        return 1...product.currentStock
+        let lowerBound = cart?.contains(productId: product.id) ?? false ? 0 : 1
+        return lowerBound...product.currentStock
     }
     
     func totalFormattedPrice(for product: ProductDetailPresentationModel) -> String {
@@ -96,17 +110,9 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     }
     
     private func editProductQuantity(product: ProductDetailPresentationModel, with newQuantity: Int) {
+        guard let cart = cart, let item = cart.items.filter({ $0.productId == product.id }).first else { return }
         isLoading = true
-        
-        interactor.fetchCart()
-            .tryMap { cart -> Int? in
-                return cart?.items.filter { $0.productId == product.id }.first?.id
-            }
-            .compactMap { $0 }
-            .flatMap{ [weak self] (cartItemId: Int) -> AnyPublisher<Bool, Error> in
-                guard let self else { return Fail(error: CartError.cartNotFound).eraseToAnyPublisher() }
-                return interactor.editItemInCart(itemId: cartItemId, with: quantity)
-            }
+        interactor.editItemInCart(itemId: item.id, with: newQuantity)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }
@@ -114,7 +120,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                 if case .failure(let error) = completion {
                     self.errorMessage = "Editing product quantity failed: \(error.localizedDescription)"
                     self.buttonQuantity = nil
-                    
+                    self.cartButtonPresenter?.isShowingAddToCartView.toggle()
                 }
             } receiveValue: { [weak self] success in
                 guard let self else { return }
@@ -122,6 +128,34 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                     self.initialQuantity = newQuantity
                     self.quantity = newQuantity
                     self.buttonQuantity = newQuantity
+                    interactor.saveProduct(with: product.id, with: newQuantity)
+                    self.cartButtonPresenter?.isShowingAddToCartView.toggle()
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func removeProductFromCart(_ product: ProductDetailPresentationModel) {
+        guard let cart = cart, let item = cart.items.filter({ $0.productId == product.id }).first else { return }
+        isLoading = true
+        interactor.deleteItemFromCart(with: item.id)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] completion in
+                guard let self else { return }
+                self.isLoading = false
+                if case .failure(let error) = completion {
+                    self.errorMessage = "Editing product quantity failed: \(error.localizedDescription)"
+                    self.buttonQuantity = nil
+                    self.cartButtonPresenter?.isShowingAddToCartView.toggle()
+                }
+            } receiveValue: { [weak self] success in
+                guard let self else { return }
+                if success {
+                    self.initialQuantity = 0
+                    self.quantity = 0
+                    self.buttonQuantity = 0
+                    interactor.removeProductFromCart(with: product.id)
+                    self.cartButtonPresenter?.isShowingAddToCartView.toggle()
                 }
             }
             .store(in: &cancellables)
@@ -129,7 +163,7 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
     
     private func addProdtuctToCart(_ product: ProductDetailPresentationModel) {
         isLoading = true
-        interactor.addProductToCart(product.product, with: quantity)
+        interactor.addProductToCart(with: product.id, and: quantity)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }
@@ -137,15 +171,33 @@ class AddToCartViewPresenter: AddToCartViewPresenterProtocol {
                 if case .failure(let error) = completion {
                     self.errorMessage = "Adding product to Cart failed: \(error.localizedDescription)"
                 }
+                self.cartButtonPresenter?.isShowingAddToCartView.toggle()
             } receiveValue: { [weak self] response in
                 guard let self = self else { return }
                 self.isLoading = false
                 if response.created {
                     self.buttonQuantity = quantity
                     self.initialQuantity = quantity
+                    self.saveProductToCart(productId: product.id, itemId: response.itemId, quantity: quantity)
+                    self.cartButtonPresenter?.isShowingAddToCartView.toggle()
                 }
             }
             .store(in: &cancellables)
     }
     
+}
+
+//TODO: Make this the interactor's job
+extension AddToCartViewPresenter {
+    private func saveProductToCart(productId: Int,itemId: Int, quantity: Int) {
+        let productList = interactor.retrieveProducts()
+        
+        guard productList.count > 0 else { return }
+        
+        guard let product = productList.filter ({ $0.id  == productId }).first else { return }
+        
+        let cartItem = CartItemPresentationModel(id: itemId, productId: productId, quantity: quantity, product: product)
+        
+        interactor.saveItemToCart(cartItem: cartItem)
+    }
 }

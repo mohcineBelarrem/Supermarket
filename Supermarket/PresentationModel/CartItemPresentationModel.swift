@@ -6,38 +6,44 @@
 //
 
 import Foundation
+import SwiftData
 
-struct CartPresentationModel: Codable {
-    let cartId: String
-    let items: [CartItemPresentationModel]
+@Model
+class CartPresentationModel {
+    var cartId: String
+    var items: [CartItemPresentationModel]
     
-    var isEmpty: Bool { items.isEmpty }
+    init(cartId: String, items: [CartItemPresentationModel]) {
+        self.cartId = cartId
+        self.items = items
+    }
     
-    init (_ cart: Cart, _ products: [Product] = []) {
-        self.cartId = cart.cartId
-        self.items = cart.items.map { (cartItem: CartItem) in
-            
-            let name = products.filter { $0.id == cartItem.productId }.first?.name
-            
-            return CartItemPresentationModel(cartItem, name: name)
-        } 
+    func contains(productId: Int) -> Bool {
+        return items.contains(where: { $0.productId == productId })
     }
 }
 
-struct CartItemPresentationModel: Identifiable, Codable {
-    let id: Int
-    let productId: Int
-    let name: String?
-    let quantity: Int
+@Model
+class CartItemPresentationModel: Identifiable {
+    var id: Int
+    var productId: Int
+    var quantity: Int
+    var product: ProductDetailPresentationModel
     
-    init(_ cartItem: CartItem, name: String?) {
-        self.id = cartItem.id
-        self.productId = cartItem.productId
-        self.quantity = cartItem.quantity
-        self.name = name
+    init(id: Int, productId: Int, quantity: Int, product: ProductDetailPresentationModel) {
+        self.id = id
+        self.productId = productId
+        self.quantity = quantity
+        self.product = product
     }
     
-    var label: String {
-        name ?? "\(productId)"
+    var totalFormattedPrice: String {
+        let price = Double(quantity) * product.price
+        return price.formattedPrice
     }
+    
+    var detailledPrice: String {
+        return "(\(quantity) x \(product.price.formattedPrice))"
+    }
+    
 }

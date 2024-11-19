@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 import Combine
 
 class ProductListPresenter: ObservableObject {
@@ -21,22 +22,21 @@ class ProductListPresenter: ObservableObject {
     init(interactor: ProductListInteractorProtocol, router: ProductListRouterProtocol) {
         self.interactor = interactor
         self.router = router
+        self.productCategories = self.regroupProductsByCategories(products: interactor.retrieveProducts())
     }
     
     func viewDidLoad() {
         interactor.fetchProducts()
+            .flatMap { (products: [Product]) in
+                Publishers.MergeMany(products.map { [weak self] (product : Product) in
+                    guard let self else { return Empty<ProductDetail, Error>().eraseToAnyPublisher() }
+                    return self.interactor.fetchProductDetail(for: product.id)
+                })
+            }
+            .collect()
             .receive(on: DispatchQueue.main)
-            .map { (products : [Product]) in
-                let categories = Dictionary(grouping: products, by: {$0.category})
-                return categories.map { (category: String, products: [Product]) in
-                    CategoryPresentationModel(id: UUID(),
-                                              name: category,
-                                              products: products.map { ProductPresentationModel(id: $0.id,
-                                                                                                name: $0.name,
-                                                                                                category: $0.category,
-                                                                                                inStock: $0.inStock)}
-                    )
-                }
+            .map { (products : [ProductDetail]) in
+                return products.map { ProductDetailPresentationModel(product: $0) }
             }
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -45,17 +45,37 @@ class ProductListPresenter: ObservableObject {
                 case .finished:
                     break
                 }
-            }, receiveValue: { productCategories in
-                self.productCategories = productCategories.sorted(by: { $0.name < $1.name })
+            }, receiveValue: { [weak self] (products: [ProductDetailPresentationModel]) in
+                guard let self else { return }
+                self.interactor.store(products: products)
+                self.productCategories = self.regroupProductsByCategories(products: products)
             })
             .store(in: &cancellables)
     }
     
-    func detailView(for product: ProductPresentationModel) -> AnyView {
-        router.routeToDetailView(for: product)
+    func detailView(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToDetailView(for: product.id, modelContext: modelContext)
     }
     
-    func productView(for product: ProductPresentationModel) -> AnyView {
+    func categoryView(for category: CategoryPresentationModel) -> AnyView {
+        router.routeToCategoryView(for: category)
+    }
+    
+    func productView(for product: ProductDetailPresentationModel) -> AnyView {
         router.routeToProductView(for: product)
+    }
+    
+    func cartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {
+        router.routeToCartButton(for: product, modelContext: modelContext)
+    }
+    
+    private func regroupProductsByCategories(products: [ProductDetailPresentationModel]) -> [CategoryPresentationModel] {
+        let categories = Dictionary(grouping: products, by: {$0.category})
+        return categories.map { (category: String, products: [ProductDetailPresentationModel]) in
+            CategoryPresentationModel(id: UUID(),
+                                      name: category,
+                                      products: products
+            )
+        }.sorted(by: {$0.name < $1.name})
     }
 }

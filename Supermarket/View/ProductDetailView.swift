@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ProductDetailView: View {
     @StateObject var presenter: ProductDetailPresenter
     var productId: Int
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -28,7 +30,8 @@ struct ProductDetailView: View {
                     }
                     Spacer()
                     if presenter.isUserLoggedIn {
-                        presenter.addToCartButton(for: productDetail)
+                        presenter.addToCartButton(for: productDetail,
+                                                  modelContext: modelContext)
                     }
                 }
             } else{
@@ -41,5 +44,7 @@ struct ProductDetailView: View {
 }
 
 #Preview {
-    ProductDetailRouter.createModule(with: 4643)
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    ProductDetailRouter.createModule(with: 4643,
+                                     modelContext: mockModelContainer.mainContext)
 }

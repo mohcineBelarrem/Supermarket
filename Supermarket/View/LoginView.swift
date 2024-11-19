@@ -6,11 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct LoginView: View {
     @ObservedObject var presenter: LoginPresenter
     @State private var username: String = ""
     @State private var email: String = ""
+    
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         VStack {
@@ -18,7 +21,7 @@ struct LoginView: View {
                 presenter.profileView(for: user)
                 
                 Button(action: {
-                    presenter.logout()
+                    presenter.showAlert.toggle()
                 }, label: {
                     Text("Logout")
                         .padding()
@@ -53,10 +56,21 @@ struct LoginView: View {
                 }
             }
         }
+        .alert("Logout", isPresented: $presenter.showAlert, actions: {
+            Button("Ok", role: .none) { presenter.logout() }
+            Button("Cancel", role: .cancel) { }
+            
+        }, message: {
+            Text("Are you sure you want to log out?")
+        })
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.background)
+        
     }
 }
 
 #Preview {
-    LoginRouter.createModule()
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    LoginRouter.createModule(with: mockModelContainer.mainContext)
 }

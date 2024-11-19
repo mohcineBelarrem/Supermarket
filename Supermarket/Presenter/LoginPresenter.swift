@@ -12,6 +12,8 @@ protocol LoginPresenterProtocol: ObservableObject {
     var user: UserPresentationModel? { get }
     var errorMessage: String? { get }
     func login(username: String, email: String)
+    
+    
     func profileView(for user: UserPresentationModel) -> AnyView
     func logout()
 }
@@ -25,6 +27,8 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
     
+    @Published var showAlert: Bool = false
+    
    init(interactor: LoginInteractorProtocol, router: LoginRouterProtocol) {
         self.interactor = interactor
         self.router = router
@@ -34,12 +38,15 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
     func login(username: String, email: String) {
         isLoading = true
         interactor.login(username: username, email: email)
-            .sink(receiveCompletion: { completion in
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                guard let self else { return }
                 if case .failure(let error) = completion {
                     self.errorMessage = "Login failed: \(error.localizedDescription)"
                     self.isLoading = false
                 }
-            }, receiveValue: { userCreationResponse in
+            }, receiveValue: { [weak self] userCreationResponse in
+                guard let self else { return }
                 let user: UserPresentationModel = .init(username: username, email: email, accessToken: userCreationResponse.accessToken)
                 self.user = user
                 self.interactor.store(user: user)
@@ -53,7 +60,7 @@ class LoginPresenter: ObservableObject, LoginPresenterProtocol {
     }
     
     func logout() {
-        //TODO: Clear cartId also
+        interactor.clearCart()
         interactor.clearStoredCredentials()
         user = nil
     }

@@ -6,15 +6,17 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct CartView: View {
     @StateObject var presenter: CartPresenter
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
         VStack {
             if presenter.isUserLoggedIn {
                 if let cart = presenter.cart {
-                    if cart.isEmpty {
+                    if cart.items.isEmpty {
                         Text("Your cart is empty.")
                         Button {
                             presenter.goToProductList()
@@ -27,18 +29,22 @@ struct CartView: View {
                         .font(.system(size: 20, weight: .bold))
                         .cornerRadius(8)
                     } else {
-                        List(cart.items) { item in
-                            HStack {
-                                Text("\(item.quantity)")
-                                Spacer()
-                                Text(item.label)
-                                Spacer()
-                                Button {
-                                    presenter.deleteCartItem(with: item.id)
-                                } label: {
-                                    Image(systemName: "trash")
+                        ScrollView {
+                            ForEach(presenter.cartItems) { (item: CartItemPresentationModel) in
+                                HStack {
+                                    presenter.cartItemView(for: item)
+                                    presenter.cartButton(for: item.product,
+                                                         modelContext: modelContext)
                                 }
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
                             }
+                        }
+                        .padding()
+                        Spacer()
+                        if let totalFormattedPrice = presenter.totalFormattedPrice {
+                            Text("Total: \(totalFormattedPrice)")
                         }
                     }
                 } else if let errorMessage = presenter.errorMessage {
@@ -69,12 +75,17 @@ struct CartView: View {
             Text(presenter.alertMessage)
         })
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.background)
         .onAppear {
-            presenter.loadCart()
+            presenter.viewDidLoad()
         }
     }
 }
 
-#Preview {
-    CartRouter.createModule(with: TabController())
-}
+//#Preview {
+//    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+//    CartRouter.createModule(with: TabController(),
+//                            modelContext: mockModelContainer.mainContext)
+//}
+

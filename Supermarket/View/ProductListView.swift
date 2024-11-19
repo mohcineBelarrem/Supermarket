@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ProductListView: View {
     @StateObject var presenter: ProductListPresenter
+    @Environment(\.modelContext) private var modelContext
     
     var body: some View {
         NavigationView {
@@ -18,19 +20,28 @@ struct ProductListView: View {
             } else if presenter.productCategories.isEmpty {
                 ProgressView("Loading...")
             } else {
-                List {
+                ScrollView{
                     ForEach(presenter.productCategories) { category in
-                        Section(header: Text(category.name)) {
-                            ForEach(category.products) { product in
-                               NavigationLink {
-                                    presenter.detailView(for: product)
-                                } label: {
+                        presenter.categoryView(for: category)
+                        ForEach(category.products) { product in
+                            NavigationLink {
+                                presenter.detailView(for: product, modelContext: modelContext)
+                            } label: {
+                                HStack() {
                                     presenter.productView(for: product)
+                                    Spacer()
+                                    presenter.cartButton(for: product, modelContext: modelContext)
                                 }
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(10)
                             }
+                            .foregroundColor(.black)
                         }
                     }
                 }
+                .padding()
+                .background(Color.background)
             }
         }
         .task {
@@ -42,5 +53,6 @@ struct ProductListView: View {
 }
 
 #Preview {
-    ProductListRouter.createModule()
+    let mockModelContainer = try! ModelContainer(for: UserPresentationModel.self)
+    ProductListRouter.createModule(with: mockModelContainer.mainContext)
 }

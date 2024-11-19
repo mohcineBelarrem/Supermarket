@@ -6,15 +6,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
 protocol APIStatusRouterProtocol {
     static func createModule() -> AnyView
-    func navigateToMainView() -> AnyView
+    func navigateToMainView(with modelContext: ModelContext) -> AnyView
 }
 
 class APIStatusRouter: APIStatusRouterProtocol {
-    func navigateToMainView() -> AnyView {
-        return AnyView(MainView())
+    func navigateToMainView(with modelContext: ModelContext) -> AnyView {
+        return MainRouter.createModule(with: modelContext)
     }
     
     static func createModule() -> AnyView {

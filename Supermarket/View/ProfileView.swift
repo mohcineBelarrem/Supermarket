@@ -20,7 +20,8 @@ struct ProfileView: View {
                     Text(user.email)
                 })
             }
-            
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color.background)
         }
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)

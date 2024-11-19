@@ -75,6 +75,7 @@ struct CartView: View {
             Text(presenter.alertMessage)
         })
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.background)
         .onAppear {
             presenter.viewDidLoad()

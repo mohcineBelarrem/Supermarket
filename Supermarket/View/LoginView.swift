@@ -64,6 +64,9 @@ struct LoginView: View {
             Text("Are you sure you want to log out?")
         })
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.background)
+        
     }
 }
 

@@ -42,8 +42,6 @@ struct ProductListView: View {
                 }
                 .padding()
                 .background(Color.background)
-                Spacer()
-                    .frame(height: 100)
             }
         }
         .task {
@@ -51,7 +49,6 @@ struct ProductListView: View {
                 presenter.viewDidLoad()
             }
         }
-        .background(Color.gray)
     }
 }
 

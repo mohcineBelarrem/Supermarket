@@ -17,17 +17,9 @@ struct CartView: View {
             if presenter.isUserLoggedIn {
                 if let cart = presenter.cart {
                     if cart.items.isEmpty {
-                        Text("Your cart is empty.")
-                        Button {
+                        GoToProductsButton(title: "Your cart is empty.") {
                             presenter.goToProductList()
-                        } label: {
-                            Text("Shop")
                         }
-                        .padding()
-                        .background(.green)
-                        .foregroundStyle(.white)
-                        .font(.system(size: 20, weight: .bold))
-                        .cornerRadius(8)
                     } else {
                         ScrollView {
                             ForEach(presenter.cartItems) { (item: CartItemPresentationModel) in
@@ -67,17 +59,9 @@ struct CartView: View {
                         .padding()
                 }
             } else {
-                Text("You must be logged in to see the cart.")
-                Button {
+                GoToLoginButton(title: "You must be logged in to see the cart.") {
                     presenter.goToLogin()
-                } label: {
-                    Text("Go to Login")
                 }
-                .padding()
-                .background(.blue)
-                .foregroundStyle(.white)
-                .font(.system(size: 20, weight: .bold))
-                .cornerRadius(8)
             }
         }
         .alert("Oops", isPresented: $presenter.showAlert, actions: {

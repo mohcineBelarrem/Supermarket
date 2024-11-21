@@ -46,6 +46,17 @@ struct CartView: View {
                         if let totalFormattedPrice = presenter.totalFormattedPrice {
                             Text("Total: \(totalFormattedPrice)")
                         }
+                        Button(action: {
+                            presenter.makeOrder()
+                        }, label: {
+                            Text("Order Items")
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.darkGreen)
+                                .foregroundStyle(.white)
+                                .font(.system(size: 20, weight: .bold))
+                                .cornerRadius(8)
+                        })
                     }
                 } else if let errorMessage = presenter.errorMessage {
                     Text(errorMessage)

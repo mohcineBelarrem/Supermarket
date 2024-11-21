@@ -20,6 +20,7 @@ protocol CartPresenterProtocol: ObservableObject {
     func viewDidLoad()
     func goToLogin()
     func goToProductList()
+    func makeOrder()
 }
 
 class CartPresenter: CartPresenterProtocol {
@@ -52,6 +53,29 @@ class CartPresenter: CartPresenterProtocol {
     func viewDidLoad() {
         loadCart()
         subscribeToCartChanges()
+    }
+    
+    private func clearCartContentAndFromMemory() {
+        cart = nil
+        interactor.deleteCart()
+    }
+    
+    func makeOrder() {
+        interactor.makeOrder()
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                guard let self else { return }
+                if case .failure(let error) = completion {
+                    self.errorMessage = "Error Making Order: \(error.localizedDescription)"
+                }
+            }, receiveValue: { [weak self] response in
+                guard let self else { return }
+                if response.created {
+                    print("success")
+                    self.clearCartContentAndFromMemory()
+                }
+            })
+            .store(in: &cancellables)
     }
     
     private func subscribeToCartChanges() {

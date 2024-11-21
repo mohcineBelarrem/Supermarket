@@ -25,8 +25,10 @@ protocol CartInteractorProtocol {
     func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, Error>
     func fetchCart() -> AnyPublisher<Cart?, Error>
     func createCart() -> AnyPublisher<Cart?, Error>
+    func makeOrder() -> AnyPublisher<OrderCreationResponse, Error>
     func editItemInCart(itemId: Int, with quantity: Int) -> AnyPublisher<Bool, Error>
     func deleteItemFromCart(with itemCartId: Int) -> AnyPublisher<Bool, Error>
+    
 }
 
 class CartInteractor: CartInteractorProtocol {
@@ -54,6 +56,34 @@ class CartInteractor: CartInteractorProtocol {
     
     func retrieveCart() -> CartPresentationModel? {
         service.fetchCart()
+    }
+    
+    func makeOrder() -> AnyPublisher<OrderCreationResponse, any Error> {
+        guard let user = loginInteractor.retrieveStoredCredentials() else { return
+            Fail(error: URLError(.userAuthenticationRequired)).eraseToAnyPublisher()
+        }
+        
+        guard let cartId = service.fetchCart()?.cartId else { return
+            Fail(error: CartError.cartNotFound).eraseToAnyPublisher()
+        }
+        
+        guard let url = APIConfig.url(for: .orders) else { return
+            Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.setValue("Bearer \(user.accessToken)", forHTTPHeaderField: "Authorization")
+        
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let orderBody: OrderCreationBody = .init(cartId: cartId, customerName: user.username)
+        request.httpBody = try? JSONEncoder().encode(orderBody)
+        
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .map { $0.data }
+            .decode(type: OrderCreationResponse.self, decoder: JSONDecoder())
+            .eraseToAnyPublisher()
     }
     
     func addProductToCart(with productId: Int, and quantity: Int) -> AnyPublisher<AddToCartResponse, any Error> {

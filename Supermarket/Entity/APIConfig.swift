@@ -19,6 +19,7 @@ struct APIConfig {
         case getCartItems(String)
         case deleteCartItem(String, Int)
         case editCartItem(String, Int)
+        case orders
         
         var rawValue: String {
             switch self {
@@ -30,6 +31,8 @@ struct APIConfig {
             case .getCartItems(let id): return "/carts/\(id)/items"
             case .deleteCartItem(let cartId, let cartItemId): return "/carts/\(cartId)/items/\(cartItemId)"
             case .editCartItem(let cartId, let cartItemId): return "/carts/\(cartId)/items/\(cartItemId)"
+            case .orders: return "/orders"
+                
             }
         }
     }

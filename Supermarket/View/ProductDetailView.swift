@@ -21,19 +21,53 @@ struct ProductDetailView: View {
                     .foregroundColor(.red)
             } else if let productDetail = presenter.productDetail {
                 
-                Text(productDetail.name)
-                HStack(alignment: .center) {
-                    VStack(alignment: .leading) {
+                VStack(alignment: .leading) {
+                    HStack() {
+                        Text("Name:")
+                        Spacer()
+                        Text(productDetail.name)
+                    }
+                    Divider()
+                    
+                    HStack() {
+                        Text("Manufacturer:")
+                        Spacer()
                         Text(productDetail.manufacturer)
+                    }
+                    Divider()
+                    
+                    HStack() {
+                        Text("Category:")
+                        Spacer()
+                        Text(productDetail.category)
+                    }
+                    Divider()
+                    
+                    HStack() {
+                        Text("Price:")
+                        Spacer()
                         Text(productDetail.price.formattedPrice)
+                    }
+                    Divider()
+                    
+                    HStack() {
+                        Text("Available Quantity:")
+                        Spacer()
                         Text("\(productDetail.currentStock)")
                     }
-                    Spacer()
+                    Divider()
+                    
                     if presenter.isUserLoggedIn {
-                        presenter.addToCartButton(for: productDetail,
-                                                  modelContext: modelContext)
+                        HStack() {
+                            Spacer()
+                            presenter.addToCartButton(for: productDetail,
+                                                      modelContext: modelContext)
+                            Spacer()
+                        }
+                        .padding()
                     }
                 }
+                .padding()
             } else{
                 ProgressView("Loading...")
             }

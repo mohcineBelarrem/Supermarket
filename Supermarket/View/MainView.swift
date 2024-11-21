@@ -24,18 +24,24 @@ struct MainView: View {
                 }
                 .tag(Tab.productList)
             
-                LoginRouter.createModule(with: modelContext)
-                    .tabItem {
-                        Label("Profile", systemImage: "person.crop.circle")
-                    }
-                    .tag(Tab.login)
-            
             CartRouter.createModule(with: presenter, modelContext: modelContext)
                 .tabItem {
                     Label("Cart", systemImage: "cart")
                 }
                 .tag(Tab.cart)
                 .badge(presenter.numberOfProducts ?? 0)
+            
+            OrderListRouter.createModule(with: modelContext)
+                .tabItem {
+                    Label("Orders", systemImage: "bag.circle")
+                }
+                .tag(Tab.orderList)
+            
+            LoginRouter.createModule(with: modelContext)
+                .tabItem {
+                    Label("Profile", systemImage: "person.crop.circle")
+                }
+                .tag(Tab.login)
         }
         .navigationBarBackButtonHidden(true)
         .task {

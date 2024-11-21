@@ -13,6 +13,7 @@ enum Tab {
     case cart
     case login
     case productList
+    case orderList
 }
 
 protocol MainPresenterProtocol: ObservableObject {

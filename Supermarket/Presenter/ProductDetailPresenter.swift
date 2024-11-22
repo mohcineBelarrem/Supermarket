@@ -39,28 +39,32 @@ class ProductDetailPresenter: ProductDetailPresenterProtocol {
         if let productDetail = interactor.retrieveProduct(with: productId) {
             self.productDetail = productDetail
         } else {
-            interactor.getProductDetail(for: productId)
-                .receive(on: DispatchQueue.main)
-                .map {  ProductDetailPresentationModel(id: $0.id,
-                                                       name: $0.name,
-                                                       category: $0.category,
-                                                       inStock: $0.inStock,
-                                                       price: $0.price,
-                                                       currentStock: $0.currentStock,
-                                                       manufacturer: $0.manufacturer)
-                }
-                .sink(receiveCompletion: { completion in
-                    switch completion {
-                    case .failure(let error):
-                        self.errorMessage = error.localizedDescription
-                    case .finished:
-                        break
-                    }
-                }, receiveValue: { productDetail in
-                    self.productDetail = productDetail
-                })
-                .store(in: &cancellables)
+            fetchProduct(with: productId)
         }
+    }
+    
+    private func fetchProduct(with productId: Int) {
+        interactor.getProductDetail(for: productId)
+            .receive(on: DispatchQueue.main)
+            .map {  ProductDetailPresentationModel(id: $0.id,
+                                                   name: $0.name,
+                                                   category: $0.category,
+                                                   inStock: $0.inStock,
+                                                   price: $0.price,
+                                                   currentStock: $0.currentStock,
+                                                   manufacturer: $0.manufacturer)
+            }
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .failure(let error):
+                    self.errorMessage = error.localizedDescription
+                case .finished:
+                    break
+                }
+            }, receiveValue: { productDetail in
+                self.productDetail = productDetail
+            })
+            .store(in: &cancellables)
     }
     
     func addToCartButton(for product: ProductDetailPresentationModel, modelContext: ModelContext) -> AnyView {

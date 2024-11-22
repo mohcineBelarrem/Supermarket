@@ -14,32 +14,42 @@ struct OrderListView: View {
     
     var body: some View {
         NavigationView {
-            if presenter.isUserLoggedIn {
-                if let error = presenter.errorMessage {
-                    Text("Error: \(error)")
-                        .foregroundColor(.red)
-                } else if presenter.isLoading {
-                    ProgressView("Loading...")
-                } else {
-                    if presenter.orders.isEmpty  {
-                        GoToProductsButton(title: "Your orders are empty.") {
-                            //TODO: Redirect to productList
-                        }
+            VStack {
+                if presenter.isUserLoggedIn {
+                    if let error = presenter.errorMessage {
+                        Text("Error: \(error)")
+                            .foregroundColor(.red)
+                    } else if presenter.isLoading {
+                        ProgressView("Loading...")
                     } else {
-                        ScrollView{
-                            ForEach(presenter.orders, id: \.orderId) { orderItem in
-                                Text(orderItem.orderId)
+                        if presenter.orders.isEmpty  {
+                            GoToProductsButton(title: "Your orders are empty.") {
+                                //TODO: Redirect to productList
                             }
-                            .foregroundColor(.black)
+                        } else {
+                            ScrollView{
+                                ForEach(presenter.orders, id: \.orderId) { orderItem in
+                                    OrderItemView(item: orderItem)
+                                        .padding()
+                                        .frame(maxWidth: .infinity)
+                                        .background(Color.white)
+                                        .cornerRadius(10)
+                                }
+                                .foregroundColor(.black)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .background(Color.background)
                         }
-                        
+                    }
+                } else {
+                    GoToLoginButton(title: "You must be logged in to see orders") {
+                        //TODO: Redirect to Login
                     }
                 }
-            } else {
-                GoToLoginButton(title: "You must be logged in to see orders") {
-                    //TODO: Redirect to Login
-                }
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.background)
         }
         .task {
             presenter.viewDidLoad()

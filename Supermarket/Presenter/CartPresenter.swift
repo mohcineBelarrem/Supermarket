@@ -71,7 +71,6 @@ class CartPresenter: CartPresenterProtocol {
             }, receiveValue: { [weak self] response in
                 guard let self else { return }
                 if response.created {
-                    print("success")
                     self.clearCartContentAndFromMemory()
                 }
             })

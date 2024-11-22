@@ -49,9 +49,7 @@ struct ProductListView: View {
             }
         }
         .task {
-            if presenter.productCategories.isEmpty {
-                presenter.viewDidLoad()
-            }
+            presenter.viewDidLoad()
         }
     }
 }

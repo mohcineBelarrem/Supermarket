@@ -30,7 +30,7 @@ class ProductListPresenter: ObservableObject {
     }
     
     func viewDidLoad() {
-        loadProduct()
+        loadProducts()
         subscribeToCartChanges()
     }
     
@@ -50,7 +50,16 @@ class ProductListPresenter: ObservableObject {
         router.routeToCartButton(for: product, modelContext: modelContext)
     }
     
-    private func loadProduct() {
+    private func loadProducts() {
+        let products = interactor.retrieveProducts()
+        if products.count > 0 {
+            self.productCategories = self.regroupProductsByCategories(products: products)
+        } else {
+            fetchProducts()
+        }
+    }
+    
+    private func fetchProducts() {
         interactor.fetchProducts()
             .flatMap { (products: [Product]) in
                 Publishers.MergeMany(products.map { [weak self] (product : Product) in
@@ -85,7 +94,7 @@ class ProductListPresenter: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink(receiveValue: { [weak self] _ in
                 guard let self else { return }
-                self.loadProduct()
+                self.productCategories = self.regroupProductsByCategories(products: self.interactor.retrieveProducts())
             })
             .store(in: &cancellables)
     }

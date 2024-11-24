@@ -11,6 +11,7 @@ import SwiftData
 
 protocol OrderListRouterProtocol {
     static func createModule(with modelContext: ModelContext) -> AnyView
+    func routeOrderItemView(for orderItem: OrderItemPresentationModel) -> AnyView
 }
 
 class OrderListRouter: OrderListRouterProtocol {
@@ -27,4 +28,7 @@ class OrderListRouter: OrderListRouterProtocol {
         return AnyView(OrderListView(presenter: presenter))
     }
     
+    func routeOrderItemView(for orderItem: OrderItemPresentationModel) -> AnyView {
+        OrderItemRouter.createModule(with: orderItem)
+    }
 }

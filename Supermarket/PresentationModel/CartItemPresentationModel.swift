@@ -37,9 +37,12 @@ class CartItemPresentationModel: Identifiable {
         self.product = product
     }
     
+    var totalPrice: Double {
+        Double(quantity) * product.price
+    }
+    
     var totalFormattedPrice: String {
-        let price = Double(quantity) * product.price
-        return price.formattedPrice
+        return totalPrice.formattedPrice
     }
     
     var detailledPrice: String {

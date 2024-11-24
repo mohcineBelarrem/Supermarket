@@ -29,7 +29,7 @@ struct OrderListView: View {
                         } else {
                             ScrollView{
                                 ForEach(presenter.orders, id: \.orderId) { orderItem in
-                                    OrderItemView(item: orderItem)
+                                    presenter.routeToOrderItemView(for: orderItem)
                                         .padding()
                                         .frame(maxWidth: .infinity)
                                         .background(Color.white)

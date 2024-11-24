@@ -13,6 +13,7 @@ import Combine
 
 protocol OrderListPresenterProtocol: ObservableObject {
     func viewDidLoad()
+    func routeToOrderItemView(for orderItem: OrderItemPresentationModel) -> AnyView
     var isUserLoggedIn: Bool { get }
 }
 
@@ -40,6 +41,9 @@ class OrderListPresenter: OrderListPresenterProtocol {
         fetchOrders()
     }
     
+    func routeToOrderItemView(for orderItem: OrderItemPresentationModel) -> AnyView {
+        router.routeOrderItemView(for: orderItem)
+    }
     
     private func fetchOrders() {
         isLoading = true

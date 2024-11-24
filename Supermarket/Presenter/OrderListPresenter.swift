@@ -25,7 +25,7 @@ class OrderListPresenter: OrderListPresenterProtocol {
     
     @Published var errorMessage: String?
     @Published var isLoading: Bool = false
-    @Published var orders: [OrderItem] = []
+    @Published var orders: [OrderItemPresentationModel] = []
     
     init(interactor: OrderListInteractorProtocol, router: OrderListRouterProtocol) {
         self.interactor = interactor
@@ -44,6 +44,25 @@ class OrderListPresenter: OrderListPresenterProtocol {
     private func fetchOrders() {
         isLoading = true
         interactor.fetchOrders()
+            .compactMap { (orderItems: [OrderItem]) in
+                
+                return orderItems.compactMap { orderItem in
+                    
+                    let cartItems: [CartItemPresentationModel] = orderItem.items.compactMap { [weak self] in
+                        guard let self else { return nil }
+                        if let product = self.interactor.retrieveProduct(with: $0.productId) {
+                            return .init(id: $0.id, productId: $0.productId, quantity: $0.quantity, product: product)
+                        } else {
+                            return nil
+                        }
+                    }
+                    
+                    return OrderItemPresentationModel(orderId: orderItem.orderId,
+                                                      items: cartItems,
+                                               created: orderItem.created)
+                }
+                
+            }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 guard let self else { return }

@@ -15,11 +15,11 @@ protocol OrderListRouterProtocol {
 
 class OrderListRouter: OrderListRouterProtocol {
     static func createModule(with modelContext: ModelContext) -> AnyView {
-//        let service = OrderService(modelContext: modelContext)
+        let service = ProductService(modelContext: modelContext)
         let userProfileService = UserProfileService(modelContext: modelContext)
         let cartService = CartService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: userProfileService, cartService: cartService)
-        let interactor = OrderListInteractor(loginInteractor: loginInteractor)
+        let interactor = OrderListInteractor(loginInteractor: loginInteractor, productService: service)
         let router = OrderListRouter()
         let presenter = OrderListPresenter(interactor: interactor, router: router)
         

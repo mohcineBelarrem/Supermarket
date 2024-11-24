@@ -13,19 +13,27 @@ import SwiftData
 protocol OrderListInteractorProtocol {
     var isUserLoggedIn: Bool { get }
     func fetchOrders() -> AnyPublisher<[OrderItem], Error>
+    
+    func retrieveProduct(with productId: Int) -> ProductDetailPresentationModel?
 }
 
 
 class OrderListInteractor: OrderListInteractorProtocol {
     
     private let loginInteractor: LoginInteractorProtocol
+    private let productService: ProductServiceProtocol
     
     var isUserLoggedIn: Bool {
         loginInteractor.isUserLoggedIn
     }
     
-    init(loginInteractor: LoginInteractorProtocol) {
+    init(loginInteractor: LoginInteractorProtocol, productService: ProductServiceProtocol) {
         self.loginInteractor = loginInteractor
+        self.productService = productService
+    }
+    
+    func retrieveProduct(with productId: Int) -> ProductDetailPresentationModel? {
+        productService.fetchProduct(with: productId)
     }
     
     func fetchOrders() -> AnyPublisher<[OrderItem], Error> {

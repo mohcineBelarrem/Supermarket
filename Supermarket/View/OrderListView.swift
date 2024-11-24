@@ -48,7 +48,7 @@ struct OrderListView: View {
                 }
             }
             .padding()
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color.background)
         }
         .task {

@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct OrderItemView: View {
-    var item: OrderItem
+    var item: OrderItemPresentationModel
     var body: some View {
         VStack(alignment: .leading) {
             HStack {

@@ -18,8 +18,9 @@ class OrderListRouter: OrderListRouterProtocol {
         let service = ProductService(modelContext: modelContext)
         let userProfileService = UserProfileService(modelContext: modelContext)
         let cartService = CartService(modelContext: modelContext)
+        let orderService = OrderService(modelContext: modelContext)
         let loginInteractor = LoginInteractor(service: userProfileService, cartService: cartService)
-        let interactor = OrderListInteractor(loginInteractor: loginInteractor, productService: service)
+        let interactor = OrderListInteractor(loginInteractor: loginInteractor, productService: service, orderService: orderService)
         let router = OrderListRouter()
         let presenter = OrderListPresenter(interactor: interactor, router: router)
         

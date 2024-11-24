@@ -74,7 +74,20 @@ class OrderListPresenter: OrderListPresenterProtocol {
                 guard let self else { return }
                 self.isLoading = false
                 self.orders = orderItems
+                //self.save(fetchedOrders: orderItems)
             }
             .store(in: &cancellables)
+    }
+    
+    
+    private func save(fetchedOrders: [OrderItemPresentationModel]) {
+        let savedOrdes = self.interactor.retrieveOrders()
+        var ordersToSave: [OrderItemPresentationModel] = []
+        for order in fetchedOrders {
+            if !savedOrdes.contains(where: { $0.orderId == order.orderId }) {
+                ordersToSave.append(order)
+            }
+        }
+        self.interactor.save(orders: ordersToSave)
     }
 }

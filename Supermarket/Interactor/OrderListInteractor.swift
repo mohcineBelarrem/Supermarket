@@ -14,7 +14,9 @@ protocol OrderListInteractorProtocol {
     var isUserLoggedIn: Bool { get }
     func fetchOrders() -> AnyPublisher<[OrderItem], Error>
     
+    func retrieveOrders() -> [OrderItemPresentationModel]
     func retrieveProduct(with productId: Int) -> ProductDetailPresentationModel?
+    func save(orders: [OrderItemPresentationModel])
 }
 
 
@@ -22,18 +24,28 @@ class OrderListInteractor: OrderListInteractorProtocol {
     
     private let loginInteractor: LoginInteractorProtocol
     private let productService: ProductServiceProtocol
+    private let orderService: OrderServiceProtocol
     
     var isUserLoggedIn: Bool {
         loginInteractor.isUserLoggedIn
     }
     
-    init(loginInteractor: LoginInteractorProtocol, productService: ProductServiceProtocol) {
+    init(loginInteractor: LoginInteractorProtocol, productService: ProductServiceProtocol, orderService: OrderServiceProtocol) {
         self.loginInteractor = loginInteractor
         self.productService = productService
+        self.orderService = orderService
     }
     
     func retrieveProduct(with productId: Int) -> ProductDetailPresentationModel? {
         productService.fetchProduct(with: productId)
+    }
+    
+    func save(orders: [OrderItemPresentationModel]) {
+        orderService.save(orders: orders)
+    }
+    
+    func retrieveOrders() -> [OrderItemPresentationModel] {
+        orderService.retrieveOrders()
     }
     
     func fetchOrders() -> AnyPublisher<[OrderItem], Error> {

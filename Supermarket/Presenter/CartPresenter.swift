@@ -108,6 +108,7 @@ class CartPresenter: CartPresenterProtocol {
             }, receiveValue: { [weak self] rawCart in
                 guard let self else { return }
                 if let rawCart = rawCart, let cart = self.transform(rawCart) {
+                    print(cart.cartId)
                     self.cart = cart
                     self.cartItems = cart.items
                     if self.interactor.retrieveCart() == nil {

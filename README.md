@@ -218,11 +218,73 @@ Then the cart is cleared from memory and from Database.
 
 <h2 id="Orders">Orders</h2>
 
+By Going to the Orders Screen we have the same logic for empty orders and not logged user as in the Cart Screen.
+
+for showing orders we send a request to the /orders and we get a response in this format
+
+```json
+[
+    {
+        "id": "NH2ON0KLT3IDtDQfT4q-2",
+        "items": [
+            {
+                "id": 57929473,
+                "productId": 6483,
+                "quantity": 1
+            },
+            {
+                "id": 562827312,
+                "productId": 4646,
+                "quantity": 4
+            },
+            {
+                "id": 865531897,
+                "productId": 5774,
+                "quantity": 1
+            },
+            {
+                "id": 800532997,
+                "productId": 4641,
+                "quantity": 3
+            }
+        ],
+        "customerName": "Mohcine",
+        "created": "2024-11-25T13:41:02.854Z",
+        "comment": ""
+    }
+]
+
+```
+
+The items are in the same format as cart items they don't contain enough information so it's better to map them to products that are stored in the database so that we can get enough information and create useful objects like the following:
 
 
 
+```swift
 
+@Model
+class OrderItemPresentationModel {
+    var orderId: String
+    var items: [CartItemPresentationModel]
+    var created: String
+    
+    
+    init(orderId: String, items: [CartItemPresentationModel], created: String) {
+        self.orderId = orderId
+        self.items = items
+        self.created = created
+    }
+}
+```
 
+Then we have enough information to show for example the total of the order
+
+NB: the cells expand and retract when clicked to show the total amoun of the order like on the screeshots:
+
+<div style="display: flex; justify-content: space-around;">
+  <img src="Screenshots/OrdersListing.png" alt="OrdersListing" style="width: 45%;">
+  <img src="Screenshots/OrdersListingExpanded.png" alt="OrdersListingExpanded" style="width: 45%;">
+</div>
 
 
 

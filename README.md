@@ -28,10 +28,8 @@ https://github.com/vdespa/Postman-Complete-Guide-API-Testing/blob/main/simple-gr
   <img src="Screenshots/APIStatus.png" alt="APIStatus" width="450">
 
   <h2 id="ProductList">Product List Screen</h2>
-  The First Screen the user sees is the APIStatus Screen, In this screen we call the /status endpoint and we expect a Status of "UP".
-  After that the user is redirected to product listing or an Error screen is shown.
-
-   <img src="Screenshots/ProductListing.png" alt="ProductListing" width="450">
+  
+  <img src="Screenshots/ProductListing.png" alt="ProductListing" width="450">
 
   The first time we show the product listing we call the presenter via the interactor calls the <a href="https://simple-grocery-store-api.glitch.me/products/">/products endpoint</a> which lists products like the following format
 

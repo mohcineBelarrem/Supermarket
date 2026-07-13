@@ -8,7 +8,7 @@
 import Foundation
 
 struct APIConfig {
-    static let baseURL = "https://simple-grocery-store-api.glitch.me"
+    static let baseURL = "https://simple-grocery-store-api.click"
     
     enum Endpoint {
         case apiStatus
